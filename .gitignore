@@ -30,3 +30,15 @@
 *.exe
 *.out
 *.app
+
+# Project
+/.vs/uge/v16
+/uge/Debug
+/uge_tut01/Debug
+/uge_tut01/x64/Debug
+/bin/uge_tut01.pdb
+/bin/uge_tut01.ilk
+/bin/uge.pdb
+/bin/uge.ilk
+/bin/uge.exp
+/uge_tut02/Debug
