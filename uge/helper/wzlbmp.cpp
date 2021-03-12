@@ -82,7 +82,7 @@ namespace uge {
 
         //消息
         char buf[255] = { 0 };
-        sprintf_s(buf, "[bmp] %s %d [%d x %d] 加载成功！\n", wzl_path, sort, wzlBmp.width, wzlBmp.height);
+        sprintf_s(buf, "[bmp] %s %d [%d x %d] 加载成功", wzl_path, sort, wzlBmp.width, wzlBmp.height);
         Log(buf);
 
         return true;

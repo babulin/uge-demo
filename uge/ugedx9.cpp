@@ -256,7 +256,7 @@ namespace uge {
         //打开文件
         void* ptr1;
         DWORD size;
-        if ( ! open_file("cat.jpg", &ptr1, &size)) {
+        if ( ! open_file("image\\cat.jpg", &ptr1, &size)) {
             return false;
         }
 
