@@ -21,15 +21,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nstr, int
 bool Start() {
 	pUge = ugeCreate(UGE_VERSION);
 
-	auto app = CreateGame();
+	auto app = gameCreate();
 	pUge->SetGame(app);
 
-	if (!app->Initiate())
+	if (!app->Config())
 	{
 		return 0;
 	}
 
-	if (pUge->Initiate())
+	if (pUge->Initiate() && app->Initiate())
 	{
 		pUge->Start();
 	}

@@ -2,17 +2,23 @@
 #include <ugex.h>
 
 class SandBox : public uge::Game {
+
 public:
 	SandBox() {
 
 	}
+
+	bool Config() {
+		std::cout << "SandBox::Config()" << std::endl;
+		//设置参数
+		pUge->SetTitle("UGE Initiate - tut01 v1.0.0");
+		pUge->SetWindowed(true);
+		pUge->SetScreen(1024, 768);
+		return true;
+	}
+
 	bool Initiate() {
 		std::cout << "SandBox::Initiate()" << std::endl;
-
-		//设置参数
-		pUge->SetTitle("UGE Initiate - tut01");
-		pUge->SetWindowed(true);
-		pUge->SetScreen(800, 600);
 		return true;
 	}
 
@@ -27,8 +33,8 @@ public:
 	}
 };
 
-uge::Game* uge::CreateGame()
+uge::Game* uge::gameCreate()
 {
-	std::cout << "调试输出 CreateApplication" << std::endl;
+	std::cout << "createGame()" << std::endl;
 	return new SandBox();
 }

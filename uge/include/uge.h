@@ -54,12 +54,13 @@ namespace uge {
 	class Game {
 	public:
 		Game() {}
+		virtual bool Config() = 0;
 		virtual bool Initiate() = 0;
 		virtual bool Update() = 0;
 		virtual bool Show() = 0;
 	};
 
-	Game* CreateGame();
+	Game* gameCreate();
 
 	// ÒýÇæ½Ó¿Ú
 	class UGE {
