@@ -36,9 +36,7 @@ namespace uge {
 		ugeBlendMode blend;
 		~ugeQuad() {
 			if (texture)
-			{
 				delete texture;
-			}
 		}
 	};
 
