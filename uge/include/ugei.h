@@ -56,8 +56,8 @@ namespace uge {
 		virtual void UGE_CALL Release() override;									//引擎释放
 		virtual std::string GetErrMsg() override;
 
-		virtual TextureList* LoadTexture(const char* filename, bool bMipmap = false) override;
-		virtual TextureList* LoadWzl(const char* filename,int sort) override;
+		virtual ugeTexture* LoadTexture(const char* filename, bool bMipmap = false) override;
+		virtual ugeTexture* LoadWzl(const char* filename,int sort) override;
 		virtual void DxRenderQuad(ugeQuad* quad) override;
 
 		// 成员函数
@@ -110,8 +110,7 @@ namespace uge {
 		uint32_t _fps;					//前1秒的帧率
 
 		// Graphics
-		TextureList* _texture_list;		//纹理链表
-		TextureList* _cur_tex;			//当前纹理
+		ugeTexture* _texture_list;		//纹理链表
 		bool _z_buffer;					//是否开启z缓冲
 
 		UgeIDirect3D* _d3d;				//d3d对象

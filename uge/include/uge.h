@@ -21,20 +21,25 @@ namespace uge {
 	};
 
 	// 纹理链表 [堆 后进先出]
-	struct TextureList {
+	struct ugeTexture {
 		uintptr_t tex;	//纹理地址
 		int width;
 		int height;
-		TextureList* next;
 	};
 
 	//纹理结构
 	struct ugeQuad {
 		float x;
 		float y;
-		TextureList* texture;
+		ugeTexture* texture;
 		ugeVertex v[4];
 		ugeBlendMode blend;
+		~ugeQuad() {
+			if (texture)
+			{
+				delete texture;
+			}
+		}
 	};
 
 	// 回调函数类型
@@ -51,6 +56,7 @@ namespace uge {
 	class Game {
 	public:
 		Game() {}
+		virtual ~Game() = default;
 		virtual bool Config() = 0;
 		virtual bool Initiate() = 0;
 		virtual bool Update() = 0;
@@ -74,8 +80,8 @@ namespace uge {
 		virtual void UGE_CALL Release() = 0;
 		virtual std::string GetErrMsg() = 0;
 
-		virtual TextureList* LoadTexture(const char* filename, bool bMipmap = false) = 0;
-		virtual TextureList* LoadWzl(const char* filename, int sort) = 0;
+		virtual ugeTexture* LoadTexture(const char* filename, bool bMipmap = false) = 0;
+		virtual ugeTexture* LoadWzl(const char* filename, int sort) = 0;
 		virtual void DxRenderQuad(ugeQuad *quad) = 0;
 	};
 

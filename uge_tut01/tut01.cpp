@@ -9,6 +9,11 @@ class SandBox : public uge::Game {
 	float x = 100.0f, y = 100.0f;
 public:
 	SandBox() {
+		quad = {};
+		quad1 = {};
+	}
+
+	~SandBox() {
 
 	}
 

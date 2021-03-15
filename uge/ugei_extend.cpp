@@ -22,7 +22,7 @@ namespace uge {
 		return err_msg;
 	}
 
-	TextureList* UGEI::LoadTexture(const char* filename,bool bMipmap)
+	ugeTexture* UGEI::LoadTexture(const char* filename,bool bMipmap)
 	{
 		UgeTexture* p_tex;
 		D3DXIMAGE_INFO info;
@@ -53,17 +53,15 @@ namespace uge {
 		Log("纹理:%d x %d fmt：%s", info.Width, info.Height, _FormatStr(info.Format));
 
 		//纹理链表
-		const auto tex_item = new TextureList();
+		const auto tex_item = new ugeTexture();
 		tex_item->tex = reinterpret_cast<UTEXTURE>(p_tex);
 		tex_item->width = info.Width;
 		tex_item->height = info.Height;
-		tex_item->next = _texture_list;
-		_texture_list = tex_item;
 
 		return tex_item;
 	}
 
-	TextureList* UGEI::LoadWzl(const char* filename,int sort)
+	ugeTexture* UGEI::LoadWzl(const char* filename,int sort)
 	{
 		//加载hum
 		WzlBmp bmp(filename,_d3d_device);
@@ -81,12 +79,10 @@ namespace uge {
 		delete[] dstBuffer;
 
 		//纹理链表
-		const auto tex_item = new TextureList();
+		const auto tex_item = new ugeTexture();
 		tex_item->tex = u_tex;
 		tex_item->width = wzlBmp.width;
 		tex_item->height = wzlBmp.height;
-		tex_item->next = _texture_list;
-		_texture_list = tex_item;
 
 		return tex_item;
 	}
