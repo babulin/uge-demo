@@ -15,3 +15,6 @@
 #endif // UGEDLL
 
 #define UGE_CALL  __stdcall
+
+
+using UTEXTURE = uintptr_t;

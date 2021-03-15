@@ -38,6 +38,7 @@ bool Start() {
 		MessageBox(nullptr, pUge->GetErrMsg().c_str(), "Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
 	}
 
+	delete app;
 	pUge->Release();
 
 	return false;

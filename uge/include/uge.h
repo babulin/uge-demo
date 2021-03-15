@@ -20,35 +20,32 @@ namespace uge {
 		float tx, ty; // texture coordinates
 	};
 
-	//wzx头部结构
-	struct WzxHeader {
-		char description[20];	//www.shandagames.com
-		int x1[6];				//占位
-		int imageCount;			//图片数量
+	// 纹理链表 [堆 后进先出]
+	struct TextureList {
+		uintptr_t tex;	//纹理地址
+		int width;
+		int height;
+		TextureList* next;
 	};
 
-	//Wzl头部结构
-	struct WzlHeader {
-		char description[44];	//www.shandagames.com
-		int imageCount;			//图片数量
-		int x3[4];				//占位
-	};
-
-	//Wzl图片信息结构
-	struct WzlBmpInfo {
-		BYTE pixelFormat;	//图片位深
-		BYTE compressed;	//表示图片数据是否经过gzip压缩
-		BYTE reserve;		//占位
-		BYTE compressLevel; //如果图片数据是压缩过，这个就表示压缩的等级
-		short width;		//图片宽度
-		short height;		//图片高度
-		short x;			//偏移x
-		short y;			//偏移y
-		int size;			//图片数据长度[压缩后的]
+	//纹理结构
+	struct ugeQuad {
+		float x;
+		float y;
+		TextureList* texture;
+		ugeVertex v[4];
+		ugeBlendMode blend;
 	};
 
 	// 回调函数类型
 	typedef bool (*ugeCallback)();
+
+	// UGE 图源类型常量(顶点数量)
+	enum {
+		UGEPRIM_LINES = 2,
+		UGEPRIM_TRIPLES = 3,
+		UGEPRIM_QUADS = 4,
+	};
 
 	// 应用程序
 	class Game {
@@ -76,6 +73,10 @@ namespace uge {
 		virtual bool UGE_CALL Start() = 0;
 		virtual void UGE_CALL Release() = 0;
 		virtual std::string GetErrMsg() = 0;
+
+		virtual TextureList* LoadTexture(const char* filename, bool bMipmap = false) = 0;
+		virtual TextureList* LoadWzl(const char* filename, int sort) = 0;
+		virtual void DxRenderQuad(ugeQuad *quad) = 0;
 	};
 
 	// 图像接口

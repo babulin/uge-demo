@@ -273,6 +273,6 @@ namespace uge {
 
 	void Log(const char* format, ...);
 	bool save_bmp(const char* out_filename, int width, int height, int data_size, byte* data_buffer,bool has16To32 = false);
-	bool open_file(const char* filename, void** ptr, DWORD* size);
+	void* open_file(const char* filename, int* size);
 	const char* resoure_path(const char* filename);
 }

@@ -65,8 +65,11 @@ namespace uge {
     //+-----------------------------------
     //| 打开文件读取到内存
     //+-----------------------------------
-    bool open_file(const char* filename, void** ptr, DWORD* size)
+    void* open_file(const char* filename, int* size)
     {
+        unsigned long _size = 0;
+        void* data = nullptr;
+
         //创建纹理
         const char* path = resoure_path(filename);
         const auto h_f = CreateFile(path, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS, nullptr);
@@ -77,24 +80,29 @@ namespace uge {
             DWORD dw = GetLastError();
             sprintf_s(buff, "文件打开失败,代码:%d,路径:%s下未找到", dw, path);
             Log(buff);
-            return false;
+            return nullptr;
         }
 
-        *size = GetFileSize(h_f, nullptr);
-        *ptr = malloc(*size);
-        if (!*ptr) {
+        _size = GetFileSize(h_f, nullptr);
+        data = malloc(_size);
+        if (!data) {
             CloseHandle(h_f);
-            return false;
+            return nullptr;
         }
 
-        if (ReadFile(h_f, *ptr, *size, size, nullptr) == 0) {
+        if (ReadFile(h_f, data, _size, &_size, nullptr) == 0) {
             CloseHandle(h_f);
-            free(*ptr);
-            return false;
+            free(data);
+            return nullptr;
         }
         CloseHandle(h_f);
 
-        return true;
+        if (_size)
+        {
+            *size = _size;
+        }
+
+        return data;
     }
 
     //+-----------------------------------

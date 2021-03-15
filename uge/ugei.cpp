@@ -56,7 +56,22 @@ namespace uge {
 
 		splash_screen_enabled = true;	//启动动画
 
-		pGraphics = nullptr;			//图像接口对象
+		//dx
+		_d3d = nullptr;
+		_d3d_device = nullptr;
+		_proj_matrix = {};
+		_view_matrix = {};
+		_texture_list = nullptr;
+		_vertex_buffer = nullptr;
+		_index_buffer = nullptr;
+		_vert_array = nullptr;
+
+		_n_prim = 0;
+
+		_texture1 = nullptr;
+		_texture2 = nullptr;
+		_texture3 = nullptr;
+		_texture4 = nullptr;
 	}
 
 	//+------------------------
@@ -115,7 +130,7 @@ namespace uge {
 	{
 		if (!game && (!frame_func || !update_func))
 		{
-			SetErrMsg("System_Start: No frame function defined");
+			_SetErrMsg("引擎初始化:游戏应用或回调帧函数未设置");
 			return false;
 		}
 
@@ -151,13 +166,13 @@ namespace uge {
 		winclass.lpszClassName = WINDOW_CLASS_NAME;
 
 		if (!RegisterClass(&winclass)) {
-			SetErrMsg("注册窗口类失败!");
+			_SetErrMsg("引擎初始化:注册窗口类失败!");
 			return false;
 		}
 
 		if (screen_width == 0 || screen_height == 0)
 		{
-			SetErrMsg("窗口的宽高未设置\n");
+			_SetErrMsg("引擎初始化:窗口的宽高未设置\n");
 			return false;
 		}
 
@@ -186,31 +201,22 @@ namespace uge {
 		}
 
 		if (!hwnd) {
-			SetErrMsg("System_Start: System_Initiate wasn't called");
+			_SetErrMsg("引擎初始化:创建窗口失败");
 			return false;
 		}
-
-		//ShowWindow(hwnd, SW_SHOW);
 
 		// 初始化子系统
 		// 游戏时间
 		// 输入控制
 		// 图像渲染
-		pGraphics = static_cast<Graphics*>(new UGEDX9(hwnd,screen_width,screen_height));
-		if ( ! pGraphics)
+		if (! _DxInit())
 		{
-			SetErrMsg("图像渲染接口创建失败\n");
-			return false;
-		}
-
-		if (! pGraphics->Initiate())
-		{
-			SetErrMsg(pGraphics->GetErrMsg().c_str());
 			return false;
 		}
 		// 音频控制
 
 		Log("初始化完成...");
+		Log("+========[Your Game Engine]========+");
 		ShowWindow(hwnd, SW_SHOW);
 
 		// 时间
@@ -229,6 +235,9 @@ namespace uge {
 		return true;
 	}
 
+	//+------------------------
+	//| 运行引擎
+	//+------------------------
 	bool UGE_CALL UGEI::Start()
 	{
 		MSG msg;
@@ -295,6 +304,9 @@ namespace uge {
 						SetWindowText(hwnd, title);
 					}
 
+					//开始
+					_BeginScene();
+
 					// 更新回调函数
 					if (game)
 					{
@@ -318,8 +330,8 @@ namespace uge {
 						}
 					}
 
-					//渲染
-					pGraphics->Render();
+					//结束翻转
+					_EndScene();
 
 					if (hwnd_parent) {
 						break;
@@ -369,11 +381,29 @@ namespace uge {
 	//+------------------------
 	UGEI::~UGEI()
 	{
-		if (pGraphics)
-		{
-			delete pGraphics;
-			pGraphics = nullptr;
-		}
+		if (_d3d)
+			_d3d->Release();
+
+		if (_d3d_device)
+			_d3d_device->Release();
+
+		if (_vertex_buffer)
+			_vertex_buffer->Release();
+
+		if (_index_buffer)
+			_index_buffer->Release();
+
+		if (_texture1)
+			_texture1->Release();
+
+		if (_texture2)
+			_texture2->Release();
+
+		if (_texture3)
+			_texture3->Release();
+
+		if (_texture4)
+			_texture4->Release();
 
 		Log("UGEI析构");
 	}

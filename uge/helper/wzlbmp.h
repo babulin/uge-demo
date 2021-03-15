@@ -1,5 +1,5 @@
 #pragma once
-#include "uge.h"
+#include "ugei.h"
 #include "ugeapi.h"
 #include "zlibwapi.h"
 
@@ -266,9 +266,26 @@ namespace uge {
 	};
 
 	class UGE_EXPORT WzlBmp {
+	private:
+		UgeDevice* d3d_device;
+		const char* filename;
+
+		void *wzxData;
+		int wzxSize;
+		WzxHeader wzxHead;
+
+		void* wzlData;
+		int wzlSize;
+		WzlHeader wzlHead;
+		
 	public:
-		WzlBmp();
-		bool loadWzl(const char* filename, int sort, byte** _dstBuffer, int* _dstSize, WzlBmpInfo* _wzlBmp);
-		bool textureWzl(WzlBmpInfo wzlBmp, byte* dstBuffer, UgeTexture** _texture, UgeDevice* d3dDevice, bool has16To32 = true);
+		WzlBmp(const char* filename, UgeDevice* d3dDevice);
+		~WzlBmp();
+		UTEXTURE LoadTexture(WzlBmpInfo wzlBmp, byte* dstBuffer, bool has16To32 = true);
+		byte* _GetBmp(int sort, WzlBmpInfo* wzlBmp, int* dstSize);
+	private:
+		int _GetOffset(int sort);
+		bool _LoadWzl();
+		bool _LoadWzx();
 	};
 }

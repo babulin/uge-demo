@@ -19,3 +19,20 @@ struct ugeColor32
 
 	static constexpr ugeColor32 BLACK() { return { 0x00000000 }; }
 };
+
+//
+// HGE Blending constants
+//
+enum ugeBlendMode : uint32_t {
+    BLEND_COLORADD = 1 << 0, BLEND_COLORMUL = 0,
+    BLEND_ALPHABLEND = 1 << 1, BLEND_ALPHAADD = 0,
+    BLEND_ZWRITE = 1 << 2, BLEND_NOZWRITE = 0,
+
+    // Darken does real color multiplication, white source pixels don't change destination, while
+    // black source pixels make destination completely black
+    // Use example: http://relishgames.com/forum/index.php?p=/discussion/5799/darken-screen-plus-uneffected-hole/p1
+    BLEND_DARKEN = 1 << 3,
+    BLEND_BLACKEN = BLEND_DARKEN, /* synonym for darken */
+    BLEND_DEFAULT = (BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE),
+    BLEND_DEFAULT_Z = (BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_ZWRITE),
+};

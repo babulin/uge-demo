@@ -151,7 +151,6 @@
     <ClInclude Include="helper\image.h" />
     <ClInclude Include="include\ugex.h" />
     <ClInclude Include="include\ugecolor.h" />
-    <ClInclude Include="include\ugedx9.h" />
     <ClInclude Include="include\ugeapi.h" />
     <ClInclude Include="include\uge.h" />
     <ClInclude Include="include\ugedefs.h" />
@@ -164,8 +163,8 @@
   <ItemGroup>
     <ClCompile Include="helper\image.cpp" />
     <ClCompile Include="ugehelp.cpp" />
-    <ClCompile Include="ugedx9.cpp" />
     <ClCompile Include="ugei.cpp" />
+    <ClCompile Include="ugei_dx.cpp" />
     <ClCompile Include="ugei_extend.cpp" />
     <ClCompile Include="helper\wzlbmp.cpp" />
   </ItemGroup>
