@@ -275,4 +275,5 @@ namespace uge {
 	bool save_bmp(const char* out_filename, int width, int height, int data_size, byte* data_buffer,bool has16To32 = false);
 	void* open_file(const char* filename, int* size);
 	const char* resoure_path(const char* filename);
+	std::string get_file_name(const char* filename);
 }

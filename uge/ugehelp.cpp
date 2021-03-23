@@ -145,4 +145,25 @@ namespace uge {
         }
         return tmp_filename_;
     }
+
+    //+-----------------------------------
+    //| 获取资源的名称
+    //+-----------------------------------
+    std::string get_file_name(const char* filename)
+    {
+        char sz_name[_MAX_PATH];
+        std::string name;
+
+        strcpy_s(sz_name, filename);
+        size_t len = strlen(filename);
+        int j = 0;
+        for (int i = 0; sz_name[i]; i++) {
+            if (sz_name[i] == '/' || sz_name[i] == '\\') {
+                j = i;
+            }
+        }
+        name = &sz_name[j + 1];
+
+        return name;
+    }
 }

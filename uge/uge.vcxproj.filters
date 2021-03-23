@@ -48,6 +48,9 @@
     <ClInclude Include="zlib\zlibwapi.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\ugeresource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ugei.cpp">
@@ -66,6 +69,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ugei_dx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ugeresource.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

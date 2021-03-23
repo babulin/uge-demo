@@ -2,10 +2,10 @@
 
 namespace uge {
 
-    WzlBmp::WzlBmp(const char* filename, UgeDevice* d3dDevice)
+    WzlBmp::WzlBmp(const char* path)
 	{
-        this->d3d_device = d3dDevice;
-        this->filename = filename;
+        //this->d3d_device = d3dDevice;
+        this->path = path;
         wzxData = nullptr;
         wzxSize = 0;
         wzxHead = {};
@@ -30,7 +30,15 @@ namespace uge {
             free(wzlData);
         }
 
-        Log("wzlbmp:free 数据");
+        if (!_wzlTexMap.empty())
+        {
+            for (UWzlTexMap::iterator it = _wzlTexMap.begin(); it != _wzlTexMap.end(); it++)
+            {
+                delete it->second;
+            }
+        }
+
+        Log("wzl %s:free", path);
     }
 
     int WzlBmp::_GetOffset(int sort)
@@ -38,15 +46,21 @@ namespace uge {
         //读取第一个
         int offset = 0;
         memcpy_s(&offset, wzxSize, reinterpret_cast<byte*>(wzxData) + sizeof(wzxHead) + (sort * sizeof(int)), sizeof(offset));
-
+        if (offset == 48)
+        {
+            return 0;
+        }
         return offset;
     }
 
-    byte* WzlBmp::_GetBmp(int sort,WzlBmpInfo* wzlBmp, int* dstSize)
+    byte* WzlBmp::GetBmp(int sort,WzlBmpInfo* wzlBmp, int* dstSize)
     {
         //获取图片序号sort的偏移值offset
         int offset = _GetOffset(sort);
-
+        if (!offset)
+        {
+            return nullptr;
+        }
         //读取第一个
         WzlBmpInfo* _wzlBmp = new WzlBmpInfo();
         memcpy_s(_wzlBmp, wzlSize, reinterpret_cast<byte*>(wzlData) + offset, sizeof(WzlBmpInfo));
@@ -76,6 +90,54 @@ namespace uge {
         return dstBuffer;
     }
 
+    WzlTexture* WzlBmp::GetTextureCache(int sort)
+    {
+        //加载纹理
+        UWzlTexMap::const_iterator curWzlTexMap = _wzlTexMap.find(sort);
+        if (curWzlTexMap == _wzlTexMap.end())
+        {
+            return nullptr;
+        }
+
+        //引用次数加1
+        _wzlTexMap.at(sort)->quote++;
+
+        return curWzlTexMap->second;
+    }
+
+    bool WzlBmp::SetTextureCache(WzlTexture* tex)
+    {
+        _wzlTexMap.insert(std::pair<int, WzlTexture*>(tex->sort, tex));
+        return true;
+    }
+
+    bool WzlBmp::ReleaseTexture(int sort, bool* hasErase)
+    {
+        UWzlTexMap::const_iterator t_CurTex = _wzlTexMap.find(sort);
+        if (t_CurTex == _wzlTexMap.end())
+        {
+            return false;
+        }
+
+        //找到
+        t_CurTex->second->quote--;
+        if (t_CurTex->second->quote <= 0)
+        {
+            reinterpret_cast<UgeTexture*>(t_CurTex->second->tex)->Release();
+            delete t_CurTex->second;
+            _wzlTexMap.erase(sort);
+        }
+
+        //检查是否无纹理
+        if (_wzlTexMap.empty())
+        {
+            delete this;
+            *hasErase = true;
+        }
+        
+        return true;
+    }
+
     //+-----------------------------------
     //| 加载wzx
     //+-----------------------------------
@@ -83,7 +145,7 @@ namespace uge {
     {
         // wzx路径
         static char wzx_path[MAX_PATH];
-        strcpy_s(wzx_path, filename);
+        strcpy_s(wzx_path, path);
         strcat_s(wzx_path, ".wzx");
 
         //读取wzx
@@ -106,7 +168,7 @@ namespace uge {
     {
         // wzl路径
         static char wzl_path[MAX_PATH];
-        strcpy_s(wzl_path, filename);
+        strcpy_s(wzl_path, path);
         strcat_s(wzl_path, ".wzl");
 
         //读取wzl
@@ -121,169 +183,5 @@ namespace uge {
         return true;
     }
 
-
-
-    //+-----------------------------------
-    //| 通过wzl创建纹理
-    //+-----------------------------------
-    UTEXTURE WzlBmp::LoadTexture(WzlBmpInfo wzlBmp,byte* dstBuffer, bool has16To32)
-    {
-        //获取纹理数据
-        UgeTexture* p_tex;
-
-        //变量
-        D3DSURFACE_DESC _desc = {};//表面
-        HRESULT hr = S_OK;
-
-        ///创建贴图
-        D3DFORMAT fmt = D3DFMT_A8R8G8B8;
-        if (wzlBmp.pixelFormat == 3)
-        {
-            fmt = D3DFMT_A8R8G8B8;
-        }
-        else if (wzlBmp.pixelFormat == 5)
-        {
-            fmt = D3DFMT_R5G6B5;
-            if (has16To32)
-            {
-                fmt = D3DFMT_A8R8G8B8;
-            }
-        }
-
-        d3d_device->CreateTexture(wzlBmp.width, wzlBmp.height, 0, D3DUSAGE_DYNAMIC, fmt, D3DPOOL_DEFAULT, &p_tex, NULL);
-
-        //获取表面信息
-        p_tex->GetLevelDesc(0, &_desc);
-
-        ///表面数据
-        D3DLOCKED_RECT lockRect;
-        p_tex->LockRect(0, &lockRect, 0, 0);
-
-        int sort = 0;
-        int index = 0;
-        UINT width = _desc.Width;
-        UINT height = _desc.Height;
-
-        DWORD* imageData3 = nullptr;
-        SHORT* imageData5 = nullptr;
-        if (wzlBmp.pixelFormat == 3)
-        {
-            imageData3 = (DWORD*)lockRect.pBits;
-        }
-        else if (wzlBmp.pixelFormat == 5)
-        {
-            imageData5 = (SHORT*)lockRect.pBits;
-            if (has16To32)
-            {
-                imageData3 = (DWORD*)lockRect.pBits;
-                if (width > height)
-                {
-                    width = width + 1;
-                    height = height - 1;
-                }
-            }
-        }
-
-        //获取调色板
-        //OpenRGB();
-
-        for (UINT h = 0; h < height; h++)
-        {
-            for (UINT w = 0; w < width; w++)
-            {
-                if (wzlBmp.pixelFormat == 3) {
-                    //数据 第一行 是图片的最后一行 数据从上往下读取
-                    //D3DFMT_A8R8G8B8
-                    sort = h * width + w;
-                    BYTE  r = palette[dstBuffer[sort]].rgbRed;
-                    BYTE  g = palette[dstBuffer[sort]].rgbGreen;
-                    BYTE  b = palette[dstBuffer[sort]].rgbBlue;
-                    DWORD color = D3DCOLOR_ARGB(0xff, r, g, b);
-                    //index = (height - h) * width + w;
-
-                    //图片数组 绘制从下往上
-                    UINT index = (height - 1 - h) * lockRect.Pitch / 4 + w;
-                    if (color != 0xff000000)
-                    {
-                        imageData3[index] = D3DCOLOR_ARGB(0xff, r, g, b);
-                    }
-                    else {
-                        imageData3[index] = D3DCOLOR_ARGB(0, 0, 0, 0);
-                    }
-                }
-                else if (wzlBmp.pixelFormat == 5)
-                {
-                    if (has16To32)
-                    {
-                        //D3DFMT_R5G6B5
-                        sort = ((h * width) + w) * 2;
-                        BYTE sh1 = dstBuffer[sort];
-                        BYTE sh2 = dstBuffer[sort + 1];
-                        USHORT sVal = (sh2 << 8) | sh1;
-
-                        //D3DFMT_A8R8G8B
-                        BYTE r = (sVal & 0xF800) >> 8;
-                        BYTE g = (sVal & 0x07E0) >> 3;
-                        BYTE b = (sVal & 0x001F) << 3;
-                        DWORD color = D3DCOLOR_ARGB(0xFF, r, g, b);
-
-                        //图片数组 绘制从下往上
-                        UINT index = (height - h) * lockRect.Pitch / 4 + w;
-                        if (color != 0xFF000000)
-                        {
-                            imageData3[index] = D3DCOLOR_ARGB(0xFF, r, g, b);
-                        }
-                        else {
-                            imageData3[index] = D3DCOLOR_ARGB(0x88, 0, 0, 0);
-                        }
-                    }
-                    else {
-                        //D3DFMT_R5G6B5
-                        sort = (h * width + w) * 2;
-                        BYTE sh1 = dstBuffer[sort];
-                        BYTE sh2 = dstBuffer[sort + 1];
-                        USHORT sVal = (sh2 << 8) | sh1;
-
-                        index = (height - 1 - h) * lockRect.Pitch / 2 + w;
-                        imageData5[index] = sVal;
-                    }
-
-                }
-            }
-        }
-
-        //解锁
-        p_tex->UnlockRect(0);
-
-
-        if (wzlBmp.pixelFormat == 5 && !has16To32) {
-
-            //新建一个D3DFMT_A8R8G8B8
-            IDirect3DSurface9* srcSurface;
-            p_tex->GetSurfaceLevel(0, &srcSurface);
-
-            UgeTexture* dstTexture = nullptr;
-            IDirect3DSurface9* dstSurface;
-            hr = d3d_device->CreateTexture(wzlBmp.width, wzlBmp.height, 0, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &dstTexture, NULL);
-            dstTexture->GetSurfaceLevel(0, &dstSurface);
-
-            D3DXLoadSurfaceFromSurface(
-                dstSurface,
-                NULL, NULL,
-                srcSurface,
-                NULL, NULL,
-                D3DX_FILTER_LINEAR,
-                D3DCOLOR_ARGB(0xFF, 0, 0, 0)
-            );
-            D3DSURFACE_DESC dstDesc;
-            dstSurface->GetDesc(&dstDesc);
-
-            //释放之前的
-            p_tex->Release();
-            p_tex = dstTexture;
-        }
-
-        return reinterpret_cast<UTEXTURE>(p_tex);
-    }
 }
 

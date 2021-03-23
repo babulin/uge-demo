@@ -11,44 +11,19 @@
 
 namespace uge {
 
-	// 顶点结构体
-	struct ugeVertex {
-		float x, y; // screen position
-		float z; // Z-buffer depth 0..1
-		//float rhw;
-		//uint32_t col; // color
-		float tx, ty; // texture coordinates
-	};
-
-	// 纹理链表 [堆 后进先出]
-	struct ugeTexture {
-		uintptr_t tex;	//纹理地址
-		int width;
-		int height;
-	};
-
-	//纹理结构
-	struct ugeQuad {
-		float x;
-		float y;
-		ugeTexture* texture;
-		ugeVertex v[4];
-		ugeBlendMode blend;
-		~ugeQuad() {
-			if (texture)
-				delete texture;
-		}
+	// 纹理资源
+	struct ugeImage{
+		float x;		//坐标x
+		float y;		//坐标y
+		int width;		//图片宽
+		int height;		//图片高
+		UTEXTURE tex;	//纹理地址
+		char path[_MAX_DIR];
+		int sort;
 	};
 
 	// 回调函数类型
 	typedef bool (*ugeCallback)();
-
-	// UGE 图源类型常量(顶点数量)
-	enum {
-		UGEPRIM_LINES = 2,
-		UGEPRIM_TRIPLES = 3,
-		UGEPRIM_QUADS = 4,
-	};
 
 	// 应用程序
 	class Game {
@@ -78,20 +53,10 @@ namespace uge {
 		virtual void UGE_CALL Release() = 0;
 		virtual std::string GetErrMsg() = 0;
 
-		virtual ugeTexture* LoadTexture(const char* filename, bool bMipmap = false) = 0;
-		virtual ugeTexture* LoadWzl(const char* filename, int sort) = 0;
-		virtual void DxRenderQuad(ugeQuad *quad) = 0;
-	};
-
-	// 图像接口
-	class Graphics {
-	public:
-		virtual ~Graphics() = default;
-		virtual bool UGE_CALL Initiate() = 0;
-		virtual void UGE_CALL Clear(const ugeColor32 color) = 0;
-		virtual void UGE_CALL Render() = 0;
-		virtual std::string GetErrMsg() = 0;
-
+		virtual bool LoadTexture(const char* filename, bool bMipmap = false) = 0;
+		virtual bool LoadWzl(const char* path, int sort, ugeImage* image) = 0;
+		virtual bool ReleaseWzl(ugeImage* image) = 0;
+		virtual void DxRenderQuad(ugeImage* image) = 0;
 	};
 
 	extern "C" {

@@ -3,14 +3,12 @@
 
 class SandBox : public uge::Game {
 
-	ugeQuad quad;
-	ugeQuad quad1;
-	ugeQuad quad2[4];
+	ugeImage image;
+	ugeImage image1;
+	bool kDown = false, kDown1 = false;
 	float x = 100.0f, y = 100.0f;
 public:
 	SandBox() {
-		quad = {};
-		quad1 = {};
 	}
 
 	~SandBox() {
@@ -29,48 +27,63 @@ public:
 	bool Initiate() {
 		std::cout << "SandBox::Initiate()" << std::endl;
 
-		quad.texture = pUge->LoadTexture("image\\zk.png");
-		quad1.texture = pUge->LoadTexture("image\\cat.jpg");
+		//quad.texture = pUge->LoadTexture("image\\zk.png");
+		//quad1.texture = pUge->LoadTexture("image\\cat.jpg");
 
-		quad2[0].texture = pUge->LoadWzl("data\\hum3",0);
-		quad2[1].texture = pUge->LoadWzl("data\\hum3", 1);
-		quad2[2].texture = pUge->LoadWzl("data\\hum3", 2);
-		quad2[3].texture = pUge->LoadWzl("data\\hum3", 3);
+		pUge->LoadWzl("data\\hum3",0, &image);
+		pUge->LoadWzl("data\\hum3",0, &image1);
 
 		return true;
 	}
 
 	bool Update() {
 		//std::cout << "SandBox::Update()" << std::endl;
-		quad.x = 10.0f;
-		quad.y = 10.0f;
-
-		quad1.x = 100.0f;
-		quad1.y = 100.0f;
-
-		for (size_t i = 0; i < 4; i++)
+		//°´ÏÂ1
+		if (GetAsyncKeyState(49) & 0x8000 && kDown == false)
 		{
-			quad2[i].x = 200.0f;
-			quad2[i].y = 200.0f;
+			kDown = true;
+			pUge->ReleaseWzl(&image);
+			pUge->LoadWzl("data\\hum", 0, &image);
 		}
 
+		if (GetAsyncKeyState(50) & 0x8000 && kDown == true)
+		{
+			kDown = false;
+			pUge->ReleaseWzl(&image);
+			pUge->LoadWzl("data\\hum3", 0, &image);
+		}
+
+		if (GetAsyncKeyState(51) & 0x8000 && kDown1 == false)
+		{
+			kDown1 = true;
+			pUge->ReleaseWzl(&image1);
+			pUge->LoadWzl("data\\hum", 0, &image1);
+		}
+		if (GetAsyncKeyState(52) & 0x8000 && kDown1 == true)
+		{
+			kDown1 = false;
+			pUge->ReleaseWzl(&image1);
+			pUge->LoadWzl("data\\hum3", 0, &image1);
+		}
 		return true;
 	}
 
 	bool Show() {
 		//std::cout << "SandBox::Show()" << std::endl;
 
-		pUge->DxRenderQuad(&quad);
-
-		pUge->DxRenderQuad(&quad1);
-
-		static int frame = 0;
-		if (frame >= 4)
+		for (size_t j = 0; j < 4; j++)
 		{
-			frame = 0;
+			image.x = 100.0f + j * image.width;
+			image.y = 100.0f;
+			pUge->DxRenderQuad(&image);
+		}		
+		
+		for (size_t j = 0; j < 4; j++)
+		{
+			image1.x = 100.0f + j * image1.width;
+			image1.y = 200.0f;
+			pUge->DxRenderQuad(&image1);
 		}
-		pUge->DxRenderQuad(&quad2[frame]);
-		frame++;
 
 		return true;
 	}

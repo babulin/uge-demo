@@ -1,9 +1,38 @@
 #pragma once
-#include "ugei.h"
+#include <uge.h>
 #include "ugeapi.h"
 #include "zlibwapi.h"
+#include <unordered_map>
+#include <algorithm>
 
 namespace uge {
+
+	//wzx头部结构
+	struct WzxHeader {
+		char description[20];	//www.shandagames.com
+		int x1[6];				//占位
+		int imageCount;			//图片数量
+	};
+
+	//Wzl头部结构
+	struct WzlHeader {
+		char description[44];	//www.shandagames.com
+		int imageCount;			//图片数量
+		int x3[4];				//占位
+	};
+
+	//Wzl图片信息结构
+	struct WzlBmpInfo {
+		BYTE pixelFormat;	//图片位深
+		BYTE compressed;	//表示图片数据是否经过gzip压缩
+		BYTE reserve;		//占位
+		BYTE compressLevel; //如果图片数据是压缩过，这个就表示压缩的等级
+		short width;		//图片宽度
+		short height;		//图片高度
+		short x;			//偏移x
+		short y;			//偏移y
+		int size;			//图片数据长度[压缩后的]
+	};
 
 	//8位图 256调色板
 	const RGBQUAD palette[256] = {
@@ -265,10 +294,21 @@ namespace uge {
 			RGBQUAD{255, 255, 255},
 	};
 
-	class UGE_EXPORT WzlBmp {
+	// wzl 
+	struct WzlTexture {
+		int sort;				//序号
+		int quote;				//引用次数
+		UTEXTURE tex;			//纹理地址
+		WzlBmpInfo wzlBmpInfo;	//纹理信息
+	};
+
+	//wzl Map容器
+	typedef std::unordered_map<int, WzlTexture*> UWzlTexMap;
+
+	class WzlBmp {
 	private:
-		UgeDevice* d3d_device;
-		const char* filename;
+		//UgeDevice* d3d_device;
+		const char* path;
 
 		void *wzxData;
 		int wzxSize;
@@ -278,11 +318,14 @@ namespace uge {
 		int wzlSize;
 		WzlHeader wzlHead;
 		
+		UWzlTexMap _wzlTexMap;
 	public:
-		WzlBmp(const char* filename, UgeDevice* d3dDevice);
+		WzlBmp(const char* path);
 		~WzlBmp();
-		UTEXTURE LoadTexture(WzlBmpInfo wzlBmp, byte* dstBuffer, bool has16To32 = true);
-		byte* _GetBmp(int sort, WzlBmpInfo* wzlBmp, int* dstSize);
+		byte* GetBmp(int sort, WzlBmpInfo* wzlBmp, int* dstSize);
+		WzlTexture* GetTextureCache(int sort);
+		bool SetTextureCache(WzlTexture* tex);
+		bool ReleaseTexture(int sort,bool* hasErase);
 	private:
 		int _GetOffset(int sort);
 		bool _LoadWzl();

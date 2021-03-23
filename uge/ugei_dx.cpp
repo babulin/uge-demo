@@ -1,5 +1,4 @@
 #include "ugei.h"
-#include "wzlbmp.h"
 
 namespace uge {
 
@@ -214,76 +213,60 @@ namespace uge {
         return true;
     }
 
-    void UGEI::DxRenderQuad(ugeQuad* quad)
-    {
-        //-------------------------------------------
-        //设置顶点
-        _vertex_buffer->Lock(0, 0, reinterpret_cast<void**>(&_vert_array), D3DLOCK_DISCARD);
-        
-        _d3d_device->SetTexture(0, reinterpret_cast<UgeTexture*>(quad->texture->tex));
-
-        quad->v[0].x = quad->x;
-        quad->v[0].y = quad->y + quad->texture->height;
-        quad->v[0].z = 0.5f;
-        quad->v[0].tx = 0.0f;
-        quad->v[0].ty = 1.0f;
-
-        quad->v[1].x = quad->x;
-        quad->v[1].y = quad->y;
-        quad->v[1].z = 0.5f;
-        quad->v[1].tx = 0.0f;
-        quad->v[1].ty = 0.0f;
-
-        quad->v[2].x = quad->x + quad->texture->width;
-        quad->v[2].y = quad->y;
-        quad->v[2].z = 0.5f;
-        quad->v[2].tx = 1.0f;
-        quad->v[2].ty = 0.0f;
-
-        quad->v[3].x = quad->x + quad->texture->width;
-        quad->v[3].y = quad->y + quad->texture->height;
-        quad->v[3].z = 0.5f;
-        quad->v[3].tx = 1.0f;
-        quad->v[3].ty = 1.0f;
-
-        memcpy(&_vert_array[_n_prim * UGEPRIM_QUADS], quad->v,sizeof(ugeVertex) * UGEPRIM_QUADS);
-
-        _vertex_buffer->Unlock();
-
-        _Render();
-    }
-
-    //+-----------------------------------
-    //| 渲染
-    //+-----------------------------------
-    void UGEI::_Render()
-    {
-        _d3d_device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, 4, _n_prim * 6, 2);
-        _n_prim++;
-
-        //多顶点单个纹理渲染
-        //_d3d_device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, _n_prim << 2, 0, _n_prim << 1);
-
-        //_d3d_device->SetTexture(0, _texture2);
-        //_d3d_device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, 4, 6, 2);
-
-        //_d3d_device->SetTexture(0, _texture3);
-        //_d3d_device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, 4, 12, 2);
-
-        //_d3d_device->SetTexture(0, _texture4);
-        //_d3d_device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, 4, 18, 2);
-    }
-
     void UGEI::_BeginScene()
     {
         //创建三角形顶点
         _Clear(ugeColor32::GREY());
         _d3d_device->BeginScene();
         _n_prim = 0;
+
+        //设置顶点
+        _vertex_buffer->Lock(0, 0, reinterpret_cast<void**>(&_vert_array), D3DLOCK_DISCARD);
+    }
+
+    //+------------------------------------------
+    //| 渲染图片
+    //+------------------------------------------
+    void UGEI::DxRenderQuad(ugeImage* image)
+    {
+        ugeQuad quad;
+        quad.blend = BLEND_COLORADD;
+        quad.tex = image->tex;
+
+        quad.v[0].x = image->x;
+        quad.v[0].y = image->y + image->height;
+        quad.v[0].z = 0.5f;
+        quad.v[0].tx = 0.0f;
+        quad.v[0].ty = 1.0f;
+
+        quad.v[1].x = image->x;
+        quad.v[1].y = image->y;
+        quad.v[1].z = 0.5f;
+        quad.v[1].tx = 0.0f;
+        quad.v[1].ty = 0.0f;
+
+        quad.v[2].x = image->x + image->width;
+        quad.v[2].y = image->y;
+        quad.v[2].z = 0.5f;
+        quad.v[2].tx = 1.0f;
+        quad.v[2].ty = 0.0f;
+
+        quad.v[3].x = image->x + image->width;
+        quad.v[3].y = image->y + image->height;
+        quad.v[3].z = 0.5f;
+        quad.v[3].tx = 1.0f;
+        quad.v[3].ty = 1.0f;
+
+        _d3d_device->SetTexture(0, reinterpret_cast<UgeTexture*>(quad.tex));
+        memcpy(&_vert_array[_n_prim * UGEPRIM_QUADS], quad.v,sizeof(ugeVertex) * UGEPRIM_QUADS);
+        _d3d_device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, 4, _n_prim * 6, 2);
+        _n_prim++;
+
     }
 
     void UGEI::_EndScene()
     {
+        _vertex_buffer->Unlock();
         _d3d_device->EndScene();
         _d3d_device->Present(nullptr, nullptr, nullptr, nullptr);
     }

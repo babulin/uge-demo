@@ -1,6 +1,4 @@
 #pragma once
-#include <ugei.h>
-
 namespace uge {
 
 	class image {

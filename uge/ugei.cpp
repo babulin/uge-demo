@@ -35,43 +35,52 @@ namespace uge {
 	//+------------------------
 	//| 引擎构造函数
 	//+------------------------
-	UGEI::UGEI():
-		screen_width(0),
-		screen_height(0),
-		style_windowed(0)
+	UGEI::UGEI()
 	{
-		h_instance = GetModuleHandle(nullptr);
+		//窗口信息
 		hwnd = nullptr;
 		hwnd_parent = nullptr;
-		active = false;					//是否被激活
-		rect_windowed = {};				//窗口矩形
+		h_instance = GetModuleHandle(nullptr);
 		windowed = true;				//窗口模式
+		active = false;					//是否被激活
 		win_title = "UGE";				//窗口名称
+		rect_windowed = {};				//窗口矩形
+		screen_width = 800;				//窗口宽
+		screen_height = 600;			//窗口高
+		rect_windowed = {};				//窗口矩形
+		style_windowed = 0;				//窗口类型
 
-		_fixed_delay_ms = 0;			//固定延时
+		//资源
+		_uge_resource = new UgeResource();
 
+		//游戏参数
 		frame_func = nullptr;			//帧回调函数
 		update_func = nullptr;			//更新回调
+		splash_screen_enabled = true;	//启动动画
 		game = nullptr;					//应用程序
 
-		splash_screen_enabled = true;	//启动动画
+		//time
+		_game_time_s = 0.0f;
+		_pre_time_ms = 0;
+		_fps_time_ms = 0;
+		_delay_time_ms = 0;
+		_delay_time_s = 0.0f;
+		_fixed_delay_ms = 0;			//固定延时
+		_run_fps = 0;
+		_fps = 0;
+
 
 		//dx
+		_z_buffer = false;
 		_d3d = nullptr;
 		_d3d_device = nullptr;
 		_proj_matrix = {};
 		_view_matrix = {};
-		_texture_list = nullptr;
 		_vertex_buffer = nullptr;
 		_index_buffer = nullptr;
 		_vert_array = nullptr;
 
 		_n_prim = 0;
-
-		_texture1 = nullptr;
-		_texture2 = nullptr;
-		_texture3 = nullptr;
-		_texture4 = nullptr;
 	}
 
 	//+------------------------
@@ -220,11 +229,7 @@ namespace uge {
 		ShowWindow(hwnd, SW_SHOW);
 
 		// 时间
-		_game_time_s = 0.0f;
 		_pre_time_ms = _fps_time_ms = timeGetTime();
-		_delay_time_ms = 0;
-		_delay_time_s = 0.0f;
-		_fps = _run_fps = 0;
 
 		// 显示启动动画
 		if (splash_screen_enabled)
@@ -393,17 +398,11 @@ namespace uge {
 		if (_index_buffer)
 			_index_buffer->Release();
 
-		if (_texture1)
-			_texture1->Release();
-
-		if (_texture2)
-			_texture2->Release();
-
-		if (_texture3)
-			_texture3->Release();
-
-		if (_texture4)
-			_texture4->Release();
+		if (_uge_resource)
+		{
+			delete _uge_resource;
+			_uge_resource = nullptr;
+		}
 
 		Log("UGEI析构");
 	}
