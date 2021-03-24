@@ -18,5 +18,25 @@
     <ClCompile Include="tut01.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="login.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="character.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="world.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="character.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="login.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="world.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

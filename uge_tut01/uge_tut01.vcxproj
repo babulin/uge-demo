@@ -153,12 +153,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="character.cpp" />
+    <ClCompile Include="login.cpp" />
     <ClCompile Include="tut01.cpp" />
+    <ClCompile Include="world.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\uge\uge.vcxproj">
       <Project>{53655211-42dd-4b55-8809-c725df3bafef}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="character.h" />
+    <ClInclude Include="login.h" />
+    <ClInclude Include="world.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

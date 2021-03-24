@@ -233,26 +233,26 @@ namespace uge {
         quad.blend = BLEND_COLORADD;
         quad.tex = image->tex;
 
-        quad.v[0].x = image->x;
-        quad.v[0].y = image->y + image->height;
+        quad.v[0].x = image->x + image->px;
+        quad.v[0].y = image->y + image->height + image->py;
         quad.v[0].z = 0.5f;
         quad.v[0].tx = 0.0f;
         quad.v[0].ty = 1.0f;
 
-        quad.v[1].x = image->x;
-        quad.v[1].y = image->y;
+        quad.v[1].x = image->x + image->px;
+        quad.v[1].y = image->y + image->py;
         quad.v[1].z = 0.5f;
         quad.v[1].tx = 0.0f;
         quad.v[1].ty = 0.0f;
 
-        quad.v[2].x = image->x + image->width;
-        quad.v[2].y = image->y;
+        quad.v[2].x = image->x + image->width + image->px;
+        quad.v[2].y = image->y + image->py;
         quad.v[2].z = 0.5f;
         quad.v[2].tx = 1.0f;
         quad.v[2].ty = 0.0f;
 
-        quad.v[3].x = image->x + image->width;
-        quad.v[3].y = image->y + image->height;
+        quad.v[3].x = image->x + image->width + image->px;
+        quad.v[3].y = image->y + image->height + image->py;
         quad.v[3].z = 0.5f;
         quad.v[3].tx = 1.0f;
         quad.v[3].ty = 1.0f;
@@ -262,6 +262,26 @@ namespace uge {
         _d3d_device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, 4, _n_prim * 6, 2);
         _n_prim++;
 
+    }
+
+    //+------------------------------------------
+    //| äÖÈ¾Í¼Æ¬
+    //+------------------------------------------
+    void UGEI::DxRenderQuad(ugeAnimation* animation)
+    {
+        if (_game_time_s - animation->time > animation->rate )
+        {
+            animation->curFrame++;
+            animation->time = _game_time_s;
+            if (animation->curFrame >= animation->total)
+            {
+                animation->curFrame = 0;
+            }
+        }
+        animation->image[animation->curFrame].x = animation->x;
+        animation->image[animation->curFrame].y = animation->y;
+
+        DxRenderQuad(&animation->image[animation->curFrame]);
     }
 
     void UGEI::_EndScene()

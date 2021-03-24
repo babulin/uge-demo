@@ -4,7 +4,7 @@ const char* WINDOW_CLASS_NAME = "UGE__WNDCLASS";
 
 namespace uge {
 
-	UGEI* pUGE = nullptr;
+	UGEI* pUgei = nullptr;
 
 	//+------------------------
 	//| 导出函数
@@ -24,12 +24,12 @@ namespace uge {
 	//+------------------------
 	UGEI* UGEI::Create()
 	{
-		if (!pUGE)
+		if (!pUgei)
 		{
-			pUGE = new UGEI();
+			pUgei = new UGEI();
 		}
 
-		return pUGE;
+		return pUgei;
 	}
 
 	//+------------------------
@@ -51,7 +51,7 @@ namespace uge {
 		style_windowed = 0;				//窗口类型
 
 		//资源
-		_uge_resource = new UgeResource();
+		_wzl_cache = new wzl::WzlCache();
 
 		//游戏参数
 		frame_func = nullptr;			//帧回调函数
@@ -127,7 +127,7 @@ namespace uge {
 	//+------------------------
 	//| 应用程序
 	//+------------------------
-	void UGE_CALL UGEI::SetGame(Game* game)
+	void UGE_CALL UGEI::SetGame(ugeGame* game)
 	{
 		this->game = game;
 	}
@@ -305,7 +305,7 @@ namespace uge {
 
 						// 设置标题
 						static char title[255] = {};
-						sprintf_s(title, "%s FPS: %d", win_title.c_str(), _fps);
+						sprintf_s(title, "%s FPS: %d; time:%.4f", win_title.c_str(), _fps, _game_time_s);
 						SetWindowText(hwnd, title);
 					}
 
@@ -398,10 +398,10 @@ namespace uge {
 		if (_index_buffer)
 			_index_buffer->Release();
 
-		if (_uge_resource)
+		if (_wzl_cache)
 		{
-			delete _uge_resource;
-			_uge_resource = nullptr;
+			delete _wzl_cache;
+			_wzl_cache = nullptr;
 		}
 
 		Log("UGEI析构");
@@ -412,10 +412,15 @@ namespace uge {
 	//+------------------------
 	void UGE_CALL UGEI::Release()
 	{
-		if (pUGE)
+		if (game)
 		{
-			delete pUGE;
-			pUGE = nullptr;
+			delete game;
+		}
+
+		if (pUgei)
+		{
+			delete pUgei;
+			pUgei = nullptr;
 		}
 
 		Log("释放完成");

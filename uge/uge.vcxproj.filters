@@ -33,9 +33,6 @@
     <ClInclude Include="include\ugecolor.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="helper\wzlbmp.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="include\ugex.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -48,7 +45,7 @@
     <ClInclude Include="zlib\zlibwapi.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\ugeresource.h">
+    <ClInclude Include="include\ugegame.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -65,13 +62,10 @@
     <ClCompile Include="helper\image.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="helper\wzlbmp.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="ugei_dx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ugeresource.cpp">
+    <ClCompile Include="ugegame.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

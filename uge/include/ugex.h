@@ -2,8 +2,6 @@
 #include <uge.h>
 using namespace uge;
 
-UGE* pUge = nullptr;
-
 bool Start();
 
 int main(int argc, char** argv)
@@ -19,28 +17,26 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nstr, int
 }
 
 bool Start() {
-	pUge = ugeCreate(UGE_VERSION);
+	// 获取引擎对象
+	UGE* pUge = ugeCreate(UGE_VERSION);
 
-	auto app = gameCreate();
+	// 回调
+	auto app = gameCreate(pUge);
+
+	// 设置引擎启动类
 	pUge->SetGame(app);
 
-	if (!app->Config())
-	{
-		return 0;
-	}
-
+	// 引擎初始化
 	if (pUge->Initiate() && app->Initiate())
 	{
+		// 引擎启动
 		pUge->Start();
 	}
 	else
 	{
 		MessageBox(nullptr, pUge->GetErrMsg().c_str(), "Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
 	}
-
-	delete app;
 	pUge->Release();
-
 	return false;
 }
 

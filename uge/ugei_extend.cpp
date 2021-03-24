@@ -1,6 +1,4 @@
 #include "ugei.h"
-#include "ugeresource.h"
-
 namespace uge {
 
 	extern UGEI* pUGE;
@@ -25,7 +23,7 @@ namespace uge {
     //+-----------------------------------
     //| 通过wzl创建纹理
     //+-----------------------------------
-    UTEXTURE UGEI::CreateWzlTexture(WzlBmpInfo wzlBmp, byte* dstBuffer, bool has16To32)
+    UTEXTURE UGEI::CreateWzlTexture(wzl::WzlBmpInfo wzlBmp, byte* dstBuffer, bool has16To32)
     {
         //获取纹理数据
         UgeTexture* p_tex;
@@ -77,9 +75,15 @@ namespace uge {
                 imageData3 = (DWORD*)lockRect.pBits;
                 if (width > height)
                 {
-                    width = width + 1;
-                    height = height - 1;
+                    //width = width + 1;
+                    //height = height - 1;
                 }
+            }
+
+            if (width > height)
+            {
+                //width = width + 1;
+                //height = height - 1;
             }
         }
 
@@ -94,9 +98,9 @@ namespace uge {
                     //数据 第一行 是图片的最后一行 数据从上往下读取
                     //D3DFMT_A8R8G8B8
                     sort = h * width + w;
-                    BYTE  r = palette[dstBuffer[sort]].rgbRed;
-                    BYTE  g = palette[dstBuffer[sort]].rgbGreen;
-                    BYTE  b = palette[dstBuffer[sort]].rgbBlue;
+                    BYTE  r = wzl::palette[dstBuffer[sort]].rgbRed;
+                    BYTE  g = wzl::palette[dstBuffer[sort]].rgbGreen;
+                    BYTE  b = wzl::palette[dstBuffer[sort]].rgbBlue;
                     DWORD color = D3DCOLOR_ARGB(0xff, r, g, b);
                     //index = (height - h) * width + w;
 
@@ -127,7 +131,7 @@ namespace uge {
                         DWORD color = D3DCOLOR_ARGB(0xFF, r, g, b);
 
                         //图片数组 绘制从下往上
-                        UINT index = (height - h) * lockRect.Pitch / 4 + w;
+                        UINT index = (height - h) * lockRect.Pitch / 4  + w;
                         if (color != 0xFF000000)
                         {
                             imageData3[index] = D3DCOLOR_ARGB(0xFF, r, g, b);
@@ -155,7 +159,7 @@ namespace uge {
         p_tex->UnlockRect(0);
 
 
-        if (wzlBmp.pixelFormat == 5 && !has16To32) {
+        if (wzlBmp.pixelFormat == 15 && !has16To32) {
 
             //新建一个D3DFMT_A8R8G8B8
             IDirect3DSurface9* srcSurface;
@@ -221,14 +225,14 @@ namespace uge {
     bool UGEI::LoadWzl(const char* path,int sort,ugeImage* image)
 	{
 		// 从资源获取缓存
-		WzlBmp* bmp = _uge_resource->GetWzlCache(path);
+		wzl::Wzl* bmp = _wzl_cache->GetWzlCache(path);
 
 		// 从缓存获取纹理
-		WzlTexture* wzlTex = bmp->GetTextureCache(sort);
+		wzl::WzlTexture* wzlTex = bmp->GetTextureCache(sort);
 		if (wzlTex == nullptr)
 		{
 			//创建纹理
-			WzlBmpInfo wzlBmpInfo = {};
+            wzl::WzlBmpInfo wzlBmpInfo = {};
 			int dstSize = 0;
 
 			//读取纹理资源
@@ -240,7 +244,7 @@ namespace uge {
 			}
 
 			//创建纹理
-            wzlTex = new WzlTexture();
+            wzlTex = new wzl::WzlTexture();
             wzlTex->sort = sort;
             wzlTex->wzlBmpInfo = wzlBmpInfo;
             wzlTex->quote = 1;
@@ -253,18 +257,86 @@ namespace uge {
 		}
 
 		// 传出参数
-        strcpy_s((*image).path,path);
-        (*image).sort = sort;
-		(*image).width = wzlTex->wzlBmpInfo.width;
-		(*image).height = wzlTex->wzlBmpInfo.height;
-		(*image).tex = wzlTex->tex;
+        strcpy_s(image->path,path);
+        image->sort = sort;
+        image->px = wzlTex->wzlBmpInfo.x;
+        image->py = wzlTex->wzlBmpInfo.y;
+        image->width = wzlTex->wzlBmpInfo.width;
+        image->height = wzlTex->wzlBmpInfo.height;
+        image->tex = wzlTex->tex;
 
         return true;
 	}
 
-    bool UGEI::ReleaseWzl(ugeImage* image) {
-        if (_uge_resource->ReleaseWzlCache(image->path, image->sort)) {
+    bool UGEI::LoadWzl(const char* path, int sort,int total, ugeAnimation* animation)
+    {
+        // 从资源获取缓存
+        wzl::Wzl* bmp = _wzl_cache->GetWzlCache(path);
 
+        // 从缓存获取纹理
+        for (int i = 0; i < total; i++)
+        {
+            int t_sort = sort + i;
+            wzl::WzlTexture* wzlTex = bmp->GetTextureCache(t_sort);
+            if (wzlTex == nullptr)
+            {
+                //创建纹理
+                wzl::WzlBmpInfo wzlBmpInfo = {};
+                int dstSize = 0;
+
+                //读取纹理资源
+                byte* dstBuffer = bmp->GetBmp(t_sort, &wzlBmpInfo, &dstSize);
+                if (dstBuffer == nullptr)
+                {
+                    delete[] dstBuffer;
+                    return false;
+                }
+
+                //创建纹理
+                wzlTex = new wzl::WzlTexture();
+                wzlTex->sort = t_sort;
+                wzlTex->wzlBmpInfo = wzlBmpInfo;
+                wzlTex->quote = 1;
+                wzlTex->tex = CreateWzlTexture(wzlBmpInfo, dstBuffer);
+
+                delete[] dstBuffer;
+
+                //保存缓存
+                bmp->SetTextureCache(wzlTex);
+            }
+
+            // 传出参数
+            ugeImage* image = &(animation->image[i]);
+            strcpy_s(image->path, path);
+            image->sort = t_sort;
+            image->px = wzlTex->wzlBmpInfo.x;
+            image->py = wzlTex->wzlBmpInfo.y;
+            image->width = wzlTex->wzlBmpInfo.width;
+            image->height = wzlTex->wzlBmpInfo.height;
+            image->tex = wzlTex->tex;
+        }
+
+        animation->total = total;
+        animation->curFrame = 0;
+        animation->time = 0;
+        animation->rate = 8.0f / 60.0f;
+
+        return true;
+    }
+
+    bool UGEI::ReleaseWzl(ugeImage* image) {
+        if (_wzl_cache->ReleaseWzlCache(image->path, image->sort)) {
+
+        }
+        return true;
+    }
+
+    bool UGEI::ReleaseWzl(ugeAnimation* animation) {
+        for (int i = 0; i < animation->total; i++)
+        {
+            if (_wzl_cache->ReleaseWzlCache(animation->image[i].path, animation->image[i].sort)) {
+
+            }
         }
         return true;
     }

@@ -8,13 +8,19 @@
 #include "ugedefs.h"
 #include "ugehelp.h"
 #include "ugecolor.h"
+#include "ugegame.h"
 
 namespace uge {
+
+	// 纹理
+	using UTEXTURE = uintptr_t;
 
 	// 纹理资源
 	struct ugeImage{
 		float x;		//坐标x
 		float y;		//坐标y
+		float px;		//偏移x
+		float py;		//偏移y
 		int width;		//图片宽
 		int height;		//图片高
 		UTEXTURE tex;	//纹理地址
@@ -22,21 +28,19 @@ namespace uge {
 		int sort;
 	};
 
-	// 回调函数类型
-	typedef bool (*ugeCallback)();
-
-	// 应用程序
-	class Game {
-	public:
-		Game() {}
-		virtual ~Game() = default;
-		virtual bool Config() = 0;
-		virtual bool Initiate() = 0;
-		virtual bool Update() = 0;
-		virtual bool Show() = 0;
+	// 动画资源
+	struct ugeAnimation {
+		float x;			//坐标x
+		float y;			//坐标y
+		int total;			//总帧数
+		int curFrame;		//当前帧
+		float rate;			//播放帧率
+		float time;			//前帧时间
+		ugeImage image[8];	//图片集合
 	};
 
-	Game* gameCreate();
+	// 回调函数类型
+	typedef bool (*ugeCallback)();
 
 	// 引擎接口
 	class UGE {
@@ -44,7 +48,7 @@ namespace uge {
 		virtual ~UGE() = default;
 		virtual void UGE_CALL SetFrameCallback(const ugeCallback value) = 0;
 		virtual void UGE_CALL SetUpdateCallback(const ugeCallback value) = 0;
-		virtual void UGE_CALL SetGame(Game* game) = 0;
+		virtual void UGE_CALL SetGame(ugeGame* game) = 0;
 		virtual void UGE_CALL SetScreen(int width,int height) = 0;
 		virtual void UGE_CALL SetTitle(const char* title) = 0;
 		virtual void UGE_CALL SetWindowed(bool value) = 0;
@@ -55,12 +59,19 @@ namespace uge {
 
 		virtual bool LoadTexture(const char* filename, bool bMipmap = false) = 0;
 		virtual bool LoadWzl(const char* path, int sort, ugeImage* image) = 0;
+		virtual bool LoadWzl(const char* path, int sort,int total, ugeAnimation* animation) = 0;
 		virtual bool ReleaseWzl(ugeImage* image) = 0;
+		virtual bool ReleaseWzl(ugeAnimation* animation) = 0;
 		virtual void DxRenderQuad(ugeImage* image) = 0;
+		virtual void DxRenderQuad(ugeAnimation* animation) = 0;
 	};
+
+	ugeGame* gameCreate(UGE* _uge);
 
 	extern "C" {
 		UGE_EXPORT UGE* UGE_CALL ugeCreate(const int ver);
 	}
+
 }
+
 

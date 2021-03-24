@@ -1,7 +1,7 @@
 #pragma once
 #include "uge.h"
 #include "ugeapi.h"
-#include "ugeresource.h"
+#include "wzlcache.h"
 #include <string>
 
 namespace uge {
@@ -38,7 +38,7 @@ namespace uge {
 	public:
 		virtual void UGE_CALL SetFrameCallback(const ugeCallback value) override;	//帧回调
 		virtual void UGE_CALL SetUpdateCallback(const ugeCallback value) override;	//数据更新
-		virtual void UGE_CALL SetGame(Game* game) override;
+		virtual void UGE_CALL SetGame(ugeGame* game) override;
 		virtual void UGE_CALL SetScreen(int width, int height) override;			//屏幕宽高
 		virtual void UGE_CALL SetWindowed(bool value) override;						//是否窗口模式
 		virtual void UGE_CALL SetTitle(const char* title) override;					//窗口标题
@@ -50,8 +50,11 @@ namespace uge {
 
 		virtual bool LoadTexture(const char* filename, bool bMipmap = false) override;
 		virtual bool LoadWzl(const char* path,int sort, ugeImage* image) override;
+		virtual bool LoadWzl(const char* path, int sort, int total, ugeAnimation* animation) override;
 		virtual bool ReleaseWzl(ugeImage* image) override;
+		virtual bool ReleaseWzl(ugeAnimation* animation) override;
 		virtual void DxRenderQuad(ugeImage* image) override;
+		virtual void DxRenderQuad(ugeAnimation* animation) override;
 
 		// 成员函数
 		static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
@@ -63,7 +66,7 @@ namespace uge {
 		void _SetErrMsg(const char* error);
 
 		//resoure
-		UTEXTURE CreateWzlTexture(WzlBmpInfo wzlBmp, byte* dstBuffer, bool has16To32 = true);
+		UTEXTURE CreateWzlTexture(wzl::WzlBmpInfo wzlBmp, byte* dstBuffer, bool has16To32 = false);
 
 		//directX9
 		bool _DxInit();
@@ -91,13 +94,13 @@ namespace uge {
 		LONG style_windowed;			//窗口风格
 
 		// Resoure
-		UgeResource* _uge_resource;		//游戏资源对象
+		wzl::WzlCache* _wzl_cache;			//游戏资源对象
 
 		// 游戏参数
 		bool (*frame_func)();			//帧回调函数指针
 		bool (*update_func)();			//更新回调函数指针
 		bool splash_screen_enabled;		//是否启用开场动画
-		Game* game;						//应用程序指针
+		ugeGame* game;						//应用程序指针
 	
 		// Timer
 		float	 _game_time_s;			//游戏运行时间(s)
@@ -122,5 +125,5 @@ namespace uge {
 		int _n_prim;					//当前图源数
 	};
 
-	extern UGEI* pUge;
+	extern UGEI* pUgei;
 }
