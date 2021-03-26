@@ -8,7 +8,7 @@ uge::ugeGame* uge::gameCreate(UGE *uge)
 	//ÉèÖÃ²ÎÊı
 	uge->SetTitle("UGE Initiate - tut01 v1.0.0");
 	uge->SetWindowed(true);
-	uge->SetScreen(1024, 768);
+	uge->SetScreen(1920, 1080);
 	std::cout << "gameCreate()" << std::endl;
 	return new game::World(uge);
 }

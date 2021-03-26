@@ -154,7 +154,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="character.cpp" />
+    <ClCompile Include="hum.cpp" />
     <ClCompile Include="login.cpp" />
+    <ClCompile Include="map.cpp" />
     <ClCompile Include="tut01.cpp" />
     <ClCompile Include="world.cpp" />
   </ItemGroup>
@@ -165,7 +167,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="character.h" />
+    <ClInclude Include="hum.h" />
     <ClInclude Include="login.h" />
+    <ClInclude Include="map.h" />
     <ClInclude Include="world.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

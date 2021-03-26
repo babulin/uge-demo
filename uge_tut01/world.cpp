@@ -1,60 +1,69 @@
 #include "world.h"
 #include "login.h"
+#include "map.h"
+#include "hum.h"
 
 namespace game {
 
-	ugeImage hum;
-	ugeAnimation animation;
-	ugeAnimation animation2;
+	Map* map;
+	Hum* hum;
+
 	bool kDownSpace = false;
 	bool kDown3 = false;
+	bool kDown4 = false;
+	bool kDown5 = false;
+	bool fillmode = false;
+	int x = 295, y = 308;
 	bool World::Initiate()
 	{
 		std::cout << "World::Initiate()" << std::endl;
 
-		//¼ÓÔØÈËÎï
-		//pUge->LoadWzl("data\\hum3", 7360, &hum);
-		//pUge->LoadWzl("data\\hum3", 7296, &hum);
-		//pUge->LoadWzl("data\\ui", 1813, &hum);
-		pUge->LoadWzl("data\\hum", 7200, &hum);
-		pUge->LoadWzl("data\\hum", 11552, 6, &animation);
+
+
+		map = new Map(pUge);
+		map->Load("map\\0.map");
+		map->Show(x, y);
+
+		hum = new Hum(pUge);
+		hum->Load();
 
 		return true;
 	}
 
 	bool World::Update()
 	{
-		hum.x = 400.0f;
-		hum.y = 300.0f;
-
-		animation.x = 100.0f;
-		animation.y = 100.0f;
-
-		animation2.x = 100.0f;
-		animation2.y = 200.0f;
-
-		if (GetAsyncKeyState(49) & 0x8000 && kDownSpace == false)
+		if (GetAsyncKeyState(49) & 0x8000 && fillmode == false)
 		{
-			kDownSpace = true;
-			pUge->ReleaseWzl(&animation);
-			pUge->LoadWzl("data\\hum", 11544, 6, &animation);
-			animation2.rate = 8.0f / 60.0f;
+			fillmode = true;
+		}
+		if (GetAsyncKeyState(50) & 0x8000 && fillmode == true)
+		{
+			fillmode = false;
+		}
+		if (GetAsyncKeyState(52) & 0x8000 && kDown4 == false)
+		{
+			kDown4 = true;
+			x++;
+			map->Show(x, y);
+		}
+		if (GetAsyncKeyState(53) & 0x8000 && kDown4 == true)
+		{
+			kDown4 = false;
+			x++;
+			map->Show(x, y);
 		}
 
-		if (GetAsyncKeyState(50) & 0x8000 && kDownSpace == true)
+		if (GetAsyncKeyState(54) & 0x8000 && kDown5 == false)
 		{
-			kDownSpace = false;
-			pUge->ReleaseWzl(&animation);
-			pUge->LoadWzl("data\\hum", 11552, 6, &animation);
-			animation.rate = 5.0f / 60.0f;
+			kDown5 = true;
+			y++;
+			map->Show(x, y);
 		}
-
-		if (GetAsyncKeyState(51) & 0x8000 && kDown3 == false)
+		if (GetAsyncKeyState(55) & 0x8000 && kDown5 == true)
 		{
-			kDown3 = true;
-			pUge->ReleaseWzl(&animation);
-			pUge->LoadWzl("data\\hum3", 11552, 6, &animation);
-			animation.rate = 5.0f / 60.0f;
+			kDown5 = false;
+			y++;
+			map->Show(x, y);
 		}
 
 		return true;
@@ -62,11 +71,8 @@ namespace game {
 
 	bool World::Show()
 	{
-		pUge->DxRenderQuad(&hum);
-
-		pUge->DxRenderQuad(&animation);
-
-		
+		map->Draw(fillmode);
+		hum->Show();
 		return true;
 	}
 }

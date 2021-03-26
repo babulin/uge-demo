@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <cstdio>
 #include <iostream>
+#include "ugedefs.h"
 
 namespace uge {
 	//Bmp½á¹¹
@@ -273,7 +274,10 @@ namespace uge {
 
 	void Log(const char* format, ...);
 	bool save_bmp(const char* out_filename, int width, int height, int data_size, byte* data_buffer,bool has16To32 = false);
-	void* open_file(const char* filename, int* size);
-	const char* resoure_path(const char* filename);
+	extern "C" {
+		UGE_EXPORT void* UGE_CALL open_file(const char* filename, int* size);
+		UGE_EXPORT const char* UGE_CALL resoure_path(const char* filename);
+	}
+	
 	std::string get_file_name(const char* filename);
 }

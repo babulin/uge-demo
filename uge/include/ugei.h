@@ -11,7 +11,7 @@ namespace uge {
 		float x, y; // screen position
 		float z; // Z-buffer depth 0..1
 		//float rhw;
-		//uint32_t col; // color
+		uint32_t col; // color
 		float tx, ty; // texture coordinates
 	};
 
@@ -30,7 +30,7 @@ namespace uge {
 	};
 
 	//d3d定义
-	const int D3DFVF_UGEVERTEX = (D3DFVF_XYZ | D3DFVF_TEX1);
+	const int D3DFVF_UGEVERTEX = (D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
 	const int VERTEX_BUFFER_SIZE = 40000;
 
 	// 引擎实现接口类
@@ -53,8 +53,9 @@ namespace uge {
 		virtual bool LoadWzl(const char* path, int sort, int total, ugeAnimation* animation) override;
 		virtual bool ReleaseWzl(ugeImage* image) override;
 		virtual bool ReleaseWzl(ugeAnimation* animation) override;
-		virtual void DxRenderQuad(ugeImage* image) override;
-		virtual void DxRenderQuad(ugeAnimation* animation) override;
+		virtual void DxRenderQuad(ugeImage* image, bool fillMode = false) override;
+		virtual void DxRenderQuad(ugeAnimation* animation, bool fillMode = false) override;
+		virtual void DxRenderQuad(ugeLine* line) override;
 
 		// 成员函数
 		static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);

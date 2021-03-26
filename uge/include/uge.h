@@ -15,6 +15,15 @@ namespace uge {
 	// 纹理
 	using UTEXTURE = uintptr_t;
 
+	// 划线
+	struct ugeLine {
+		float x;		//坐标x
+		float y;		//坐标y
+		float x1;		//偏移x
+		float y1;		//偏移y
+		uint32_t col;	//颜色
+	};
+
 	// 纹理资源
 	struct ugeImage{
 		float x;		//坐标x
@@ -62,8 +71,9 @@ namespace uge {
 		virtual bool LoadWzl(const char* path, int sort,int total, ugeAnimation* animation) = 0;
 		virtual bool ReleaseWzl(ugeImage* image) = 0;
 		virtual bool ReleaseWzl(ugeAnimation* animation) = 0;
-		virtual void DxRenderQuad(ugeImage* image) = 0;
-		virtual void DxRenderQuad(ugeAnimation* animation) = 0;
+		virtual void DxRenderQuad(ugeImage* image, bool fillMode = false) = 0;
+		virtual void DxRenderQuad(ugeAnimation* animation, bool fillMode = false) = 0;
+		virtual void DxRenderQuad(ugeLine* line) = 0;
 	};
 
 	ugeGame* gameCreate(UGE* _uge);

@@ -51,7 +51,7 @@ namespace wzl {
         //读取第一个
         int offset = 0;
         memcpy_s(&offset, wzxSize, reinterpret_cast<byte*>(wzxData) + sizeof(wzxHead) + (sort * sizeof(int)), sizeof(offset));
-        if (offset == 48)
+        if (offset == 48 || offset == 0)
         {
             return 0;
         }

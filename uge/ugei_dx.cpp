@@ -227,7 +227,7 @@ namespace uge {
     //+------------------------------------------
     //| äÖÈ¾Í¼Æ¬
     //+------------------------------------------
-    void UGEI::DxRenderQuad(ugeImage* image)
+    void UGEI::DxRenderQuad(ugeImage* image,bool fillMode)
     {
         ugeQuad quad;
         quad.blend = BLEND_COLORADD;
@@ -236,28 +236,40 @@ namespace uge {
         quad.v[0].x = image->x + image->px;
         quad.v[0].y = image->y + image->height + image->py;
         quad.v[0].z = 0.5f;
+        quad.v[0].col = 0xFFFFFFFF;
         quad.v[0].tx = 0.0f;
         quad.v[0].ty = 1.0f;
 
         quad.v[1].x = image->x + image->px;
         quad.v[1].y = image->y + image->py;
         quad.v[1].z = 0.5f;
+        quad.v[1].col = 0xFFFFFFFF;
         quad.v[1].tx = 0.0f;
         quad.v[1].ty = 0.0f;
 
         quad.v[2].x = image->x + image->width + image->px;
         quad.v[2].y = image->y + image->py;
         quad.v[2].z = 0.5f;
+        quad.v[2].col = 0xFFFFFFFF;
         quad.v[2].tx = 1.0f;
         quad.v[2].ty = 0.0f;
 
         quad.v[3].x = image->x + image->width + image->px;
         quad.v[3].y = image->y + image->height + image->py;
         quad.v[3].z = 0.5f;
+        quad.v[3].col = 0xFFFFFFFF;
         quad.v[3].tx = 1.0f;
         quad.v[3].ty = 1.0f;
-
-        _d3d_device->SetTexture(0, reinterpret_cast<UgeTexture*>(quad.tex));
+        
+        if (fillMode)
+        {
+            _d3d_device->SetTexture(0, nullptr);
+            _d3d_device->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+        }
+        else {
+            _d3d_device->SetTexture(0, reinterpret_cast<UgeTexture*>(quad.tex));
+            _d3d_device->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+        }
         memcpy(&_vert_array[_n_prim * UGEPRIM_QUADS], quad.v,sizeof(ugeVertex) * UGEPRIM_QUADS);
         _d3d_device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, 4, _n_prim * 6, 2);
         _n_prim++;
@@ -267,7 +279,7 @@ namespace uge {
     //+------------------------------------------
     //| äÖÈ¾Í¼Æ¬
     //+------------------------------------------
-    void UGEI::DxRenderQuad(ugeAnimation* animation)
+    void UGEI::DxRenderQuad(ugeAnimation* animation, bool fillMode)
     {
         if (_game_time_s - animation->time > animation->rate )
         {
@@ -282,6 +294,19 @@ namespace uge {
         animation->image[animation->curFrame].y = animation->y;
 
         DxRenderQuad(&animation->image[animation->curFrame]);
+    }
+
+    void UGEI::DxRenderQuad(ugeLine* line)
+    {
+        ugeVertex ver[] = {
+            {line->x,line->y,0.5f,line->col,0.0f,0.0f},
+            {line->x1,line->y1,0.5f,line->col,0.0f,0.0f},
+        };
+
+        _d3d_device->SetTexture(0, nullptr);
+        memcpy(&_vert_array[_n_prim * UGEPRIM_QUADS], ver, sizeof(ugeVertex) * UGEPRIM_LINES);
+        _d3d_device->DrawIndexedPrimitive(D3DPT_LINELIST, 0, 0, 1, _n_prim * 6, 2);
+        _n_prim++;
     }
 
     void UGEI::_EndScene()
