@@ -40,8 +40,8 @@ namespace game {
 	public:
 		Map(UGE* pUge);
 		void Load(const char* path);
-		void Show(int x, int y);
-		void Draw(bool fillmode);
+		void LoadMap(int x, int y);
+		void Show(bool fillmode);
 		void Tiles(int sx, int sy, int tx, int ty, int sort);
 		void SmTiles(int sx, int sy,int sort);
 		void Objects(int sx, int sy, int sort);

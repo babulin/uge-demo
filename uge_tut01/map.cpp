@@ -39,7 +39,7 @@ namespace game {
 		free(data);
 	}
 
-	void Map::Show(int x,int y)
+	void Map::LoadMap(int x,int y)
 	{
 		//获取xy周围的点
 		int sort = 0;
@@ -75,21 +75,6 @@ namespace game {
 		}
 	}
 
-	void Map::Draw(bool fillmode)
-	{
-		for (int tx = 0; tx < mapSizeW; tx++)
-		{
-			for (int ty = 0; ty < mapSizeH * 2; ty++)
-			{
-				if (ty < mapSizeH)
-				{
-					pUge->DxRenderQuad(&uiTiles[tx][ty]);
-					pUge->DxRenderQuad(&uiSmTiles[tx][ty]);
-				}
-				pUge->DxRenderQuad(&uiObjects[tx][ty], fillmode);
-			}
-		}
-	}
 	void Map::Tiles(int sx, int sy,int tx,int ty,int sort)
 	{
 		//Tiles序号
@@ -141,6 +126,22 @@ namespace game {
 		}
 		else {
 			memset(&uiObjects[sx][sy], 0, sizeof(uiObjects[sx][sy]));
+		}
+	}
+
+	void Map::Show(bool fillmode)
+	{
+		for (int tx = 0; tx < mapSizeW; tx++)
+		{
+			for (int ty = 0; ty < mapSizeH * 2; ty++)
+			{
+				if (ty < mapSizeH)
+				{
+					pUge->DxRenderQuad(&uiTiles[tx][ty]);
+					pUge->DxRenderQuad(&uiSmTiles[tx][ty]);
+				}
+				pUge->DxRenderQuad(&uiObjects[tx][ty], fillmode);
+			}
 		}
 	}
 }
