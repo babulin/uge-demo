@@ -1,54 +1,23 @@
-# Prerequisites
-*.d
+﻿################################################################################
+# 此 .gitignore 文件已由 Microsoft(R) Visual Studio 自动创建。
+################################################################################
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
-# Project
-/.vs/uge/v16
-/uge/Debug
-/uge_tut01/Debug
-/uge_tut01/x64/Debug
-/bin/uge_tut01.pdb
-/bin/uge_tut01.ilk
+/.vs/uge-x/v16
+/bin/data
+/bin/obj
+/bin/zlibwapi_x64.lib
+/bin/zlibwapi_x64.dll
+/bin/wzl.lib
+/bin/wzl.exp
 /bin/uge.pdb
+/bin/uge.lib
 /bin/uge.ilk
 /bin/uge.exp
-/uge_tut02/Debug
-/release
-/uge_tut01/x64/Release
-/uge_tut01/Release
-/uge/x64/Release
-/uge/Release
-/bin/wzl.pdb
-/bin/wzl.ilk
-/bin/wzl.exp
-/bin/uge_tut01.exp
-/wzl/x64/Debug
+/bin/uge.dll
+/bin/game02.pdb
+/bin/game02.lib
+/bin/game02.ilk
+/bin/game02.exp
+/bin/game02.exe
+/bin/game.lib
+/bin/game.exp

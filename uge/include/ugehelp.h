@@ -272,9 +272,10 @@ namespace uge {
 		BYTE* data;
 	};
 
-	void Log(const char* format, ...);
+	
 	bool save_bmp(const char* out_filename, int width, int height, int data_size, byte* data_buffer,bool has16To32 = false);
 	extern "C" {
+		UGE_EXPORT void UGE_CALL Log(const char* format, ...);
 		UGE_EXPORT void* UGE_CALL open_file(const char* filename, int* size);
 		UGE_EXPORT const char* UGE_CALL resoure_path(const char* filename);
 	}

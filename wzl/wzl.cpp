@@ -3,7 +3,7 @@
 
 namespace wzl {
 
-    Wzl::Wzl(const char* path)
+    Wzl::Wzl(const char* path,uge::UGE* pUge)
     {
         this->path = path;
         wzxData = nullptr;
@@ -14,36 +14,56 @@ namespace wzl {
         wzxSize = 0;
         wzlHead = {};
 
+        //因为警告《需要有 dll 接口由 class“wzl::Wzl”的客户端使用》
+        _wzlTexMap = new UWzlTexMap();
+        this->pUge = pUge;
+
         _LoadWzx();
         _LoadWzl();
-
-        _wzlTexMap = new UWzlTexMap();
     }
 
-    Wzl::~Wzl()
+    //+-----------------------------------
+    //| 加载wzx
+    //+-----------------------------------
+    bool Wzl::_LoadWzx()
     {
-        if (wzxData)
-        {
-            free(wzxData);
+        // wzx路径
+        static char wzx_path[MAX_PATH];
+        strcpy_s(wzx_path, path);
+        strcat_s(wzx_path, ".wzx");
+
+        //读取wzx
+        wzxData = open_file(wzx_path, &wzxSize);
+        if (wzxData == nullptr) {
+            return false;
         }
 
-        if (wzlData)
-        {
-            free(wzlData);
+        //读取头部
+        memcpy_s(&wzxHead, wzxSize, wzxData, sizeof(wzxHead));
+
+        return false;
+    }
+
+    //+-----------------------------------
+    //| 加载wzl
+    //+-----------------------------------
+    bool Wzl::_LoadWzl()
+    {
+        // wzl路径
+        static char wzl_path[MAX_PATH];
+        strcpy_s(wzl_path, path);
+        strcat_s(wzl_path, ".wzl");
+
+        //读取wzl
+        wzlData = open_file(wzl_path, &wzlSize);
+        if (wzlData == nullptr) {
+            return false;
         }
 
-        if (!_wzlTexMap->empty())
-        {
-            for (UWzlTexMap::iterator it = _wzlTexMap->begin(); it != _wzlTexMap->end(); it++)
-            {
-                delete it->second;
-            }
-        }
-        if (_wzlTexMap)
-        {
-            delete _wzlTexMap;
-            _wzlTexMap = nullptr;
-        }
+        //读取头部
+        memcpy_s(&wzlHead, wzlSize, wzlData, sizeof(wzlHead));
+
+        return true;
     }
 
     int Wzl::_GetOffset(int sort)
@@ -58,7 +78,7 @@ namespace wzl {
         return offset;
     }
 
-    byte* Wzl::GetBmp(int sort, WzlBmpInfo* Wzl, int* dstSize)
+    byte* Wzl::_GetBmpData(int sort, WzlBmpInfo* Wzl, int* dstSize)
     {
         //获取图片序号sort的偏移值offset
         int offset = _GetOffset(sort);
@@ -66,6 +86,7 @@ namespace wzl {
         {
             return nullptr;
         }
+
         //读取第一个
         WzlBmpInfo* _Wzl = new WzlBmpInfo();
         memcpy_s(_Wzl, wzlSize, reinterpret_cast<byte*>(wzlData) + offset, sizeof(WzlBmpInfo));
@@ -95,25 +116,46 @@ namespace wzl {
         return dstBuffer;
     }
 
-    WzlTexture* Wzl::GetTextureCache(int sort)
+    WzlBmpTex* Wzl::GetTextureCache(int sort)
     {
-        //加载纹理
+        //查找缓存
         UWzlTexMap::const_iterator curWzlTexMap = _wzlTexMap->find(sort);
+
+        //是否找到
         if (curWzlTexMap == _wzlTexMap->end())
         {
-            return nullptr;
+            //创建纹理
+            wzl::WzlBmpInfo wzlBmpInfo = {};
+            int dstSize = 0;
+
+            //加载bmp数据
+            byte* dstBuffer = _GetBmpData(sort, &wzlBmpInfo, &dstSize);
+            if (dstBuffer == nullptr)
+            {
+                delete[] dstBuffer;
+                return nullptr;
+            }
+
+            //创建纹理
+            WzlBmpTex* wzlTex = new WzlBmpTex();
+            wzlTex->sort = sort;
+            wzlTex->wzlBmpInfo = wzlBmpInfo;
+            wzlTex->quote = 1;
+            wzlTex->tex = pUge->CreateWzlTexture(wzlBmpInfo.width, wzlBmpInfo.height, wzlBmpInfo.pixelFormat,palette,dstBuffer);
+
+            //删除bmp数据
+            delete[] dstBuffer;
+
+            //保存缓存
+            _wzlTexMap->insert(std::pair<int, WzlBmpTex*>(sort, wzlTex));
+            curWzlTexMap = _wzlTexMap->find(sort);
+        }
+        else {
+            //引用次数加1
+            _wzlTexMap->at(sort)->quote++;
         }
 
-        //引用次数加1
-        _wzlTexMap->at(sort)->quote++;
-
         return curWzlTexMap->second;
-    }
-
-    bool Wzl::SetTextureCache(WzlTexture* tex)
-    {
-        _wzlTexMap->insert(std::pair<int, WzlTexture*>(tex->sort, tex));
-        return true;
     }
 
     bool Wzl::ReleaseTexture(int sort, bool* hasErase)
@@ -121,72 +163,50 @@ namespace wzl {
         UWzlTexMap::const_iterator t_CurTex = _wzlTexMap->find(sort);
         if (t_CurTex == _wzlTexMap->end())
         {
-            return false;
+            return true;
         }
 
         //找到
         t_CurTex->second->quote--;
         if (t_CurTex->second->quote <= 0)
         {
-            //reinterpret_cast<UgeTexture*>(t_CurTex->second->tex)->Release();
+            //释放纹理
+            pUge->ReleaseWzlTexture(t_CurTex->second->tex);
+            //删除纹理
             delete t_CurTex->second;
+            //移除
             _wzlTexMap->erase(sort);
         }
 
         //检查是否无纹理
         if (_wzlTexMap->empty())
         {
-            delete this;
             *hasErase = true;
         }
 
         return true;
     }
 
-    //+-----------------------------------
-    //| 加载wzx
-    //+-----------------------------------
-    bool Wzl::_LoadWzx()
-    {
-        // wzx路径
-        static char wzx_path[MAX_PATH];
-        strcpy_s(wzx_path, path);
-        strcat_s(wzx_path, ".wzx");
 
-        //读取wzx
-        wzxData = open_file(wzx_path, &wzxSize);
-        if (wzxData == nullptr) {
-            return false;
+    Wzl::~Wzl()
+    {
+        if (wzxData)
+        {
+            free(wzxData);
         }
 
-        //读取头部
-        memcpy_s(&wzxHead, wzxSize, wzxData, sizeof(wzxHead));
-
-        return false;
-    }
-
-
-    //+-----------------------------------
-    //| 加载wzl
-    //+-----------------------------------
-    bool Wzl::_LoadWzl()
-    {
-        // wzl路径
-        static char wzl_path[MAX_PATH];
-        strcpy_s(wzl_path, path);
-        strcat_s(wzl_path, ".wzl");
-
-        //读取wzl
-        wzlData = open_file(wzl_path, &wzlSize);
-        if (wzlData == nullptr) {
-            return false;
+        if (wzlData)
+        {
+            free(wzlData);
         }
 
-        //读取头部
-        memcpy_s(&wzlHead, wzlSize, wzlData, sizeof(wzlHead));
-
-        return true;
+        if (!_wzlTexMap->empty())
+        {
+            for (UWzlTexMap::iterator it = _wzlTexMap->begin(); it != _wzlTexMap->end(); it++)
+            {
+                delete it->second;
+            }
+        }
     }
-
 }
 

@@ -1,5 +1,8 @@
 #include "ugei.h"
 
+#define LOWORDINT(n) ((int)((signed short)(LOWORD(n))))
+#define HIWORDINT(n) ((int)((signed short)(HIWORD(n))))
+
 const char* WINDOW_CLASS_NAME = "UGE__WNDCLASS";
 
 namespace uge {
@@ -50,8 +53,14 @@ namespace uge {
 		rect_windowed = {};				//窗口矩形
 		style_windowed = 0;				//窗口类型
 
-		//资源
-		_wzl_cache = new wzl::WzlCache();
+		//键盘
+		_input_char = 0;
+		_v_key = 0;
+		_zpos = 0;
+		_xpos = 0;
+		_ypos = 0.0f;
+		_mouse_over = false;
+		_is_captured = false;
 
 		//游戏参数
 		frame_func = nullptr;			//帧回调函数
@@ -98,8 +107,17 @@ namespace uge {
 	{
 		this->screen_width = width;
 		this->screen_height = height;
-	}
-
+	}	
+	
+	//+------------------------
+	//| 获取屏幕参数
+	//+------------------------
+	void UGE_CALL UGEI::GetScreen(int *width, int* height)
+	{
+		*width = this->screen_width;
+		*height = this->screen_height;
+	}	
+	
 	//+------------------------
 	//| 窗口标题
 	//+------------------------
@@ -217,6 +235,8 @@ namespace uge {
 		// 初始化子系统
 		// 游戏时间
 		// 输入控制
+		_InputInit();
+
 		// 图像渲染
 		if (! _DxInit())
 		{
@@ -265,6 +285,8 @@ namespace uge {
 			}
 
 			// 更新鼠标
+			_UpdateMouse();
+
 
 			if (active)
 			{
@@ -305,7 +327,7 @@ namespace uge {
 
 						// 设置标题
 						static char title[255] = {};
-						sprintf_s(title, "%s FPS: %d; time:%.4f", win_title.c_str(), _fps, _game_time_s);
+						sprintf_s(title, "%s FPS: %d; time:%.4f,point:[%.4f,%.4f]", win_title.c_str(), _fps, _game_time_s,_xpos,_ypos);
 						SetWindowText(hwnd, title);
 					}
 
@@ -341,6 +363,9 @@ namespace uge {
 					if (hwnd_parent) {
 						break;
 					}
+
+					//清理按键队列
+					_ClearQueue();
 				}
 				else 
 				{
@@ -375,6 +400,101 @@ namespace uge {
 				return FALSE;
 			case WM_PAINT:
 				break;
+			case WM_SYSKEYDOWN: 
+			{
+				//Log("系统按键[DOWN]:%d - %d", wparam, HIWORD(lparam));
+				uge::pUgei->_KeyboardEvents(INPUT_KEYDOWN,static_cast<int>(wparam), HIWORD(lparam) & 0xFF, (lparam & 0x40000000) ? UGEINP_REPEAT : 0,-1,-1);
+				break;
+			}
+			case WM_KEYDOWN: 
+			{
+				//Log("按键[DOWN]:%d - %d", wparam, HIWORD(lparam));
+				uge::pUgei->_KeyboardEvents(INPUT_KEYDOWN, static_cast<int>(wparam), HIWORD(lparam) & 0xFF, (lparam & 0x40000000) ? UGEINP_REPEAT : 0, -1, -1);
+				break;
+			}
+			case WM_SYSKEYUP:
+			{
+				//Log("系统按键[UP]:%d - %d", wparam, HIWORD(lparam));
+				uge::pUgei->_KeyboardEvents(INPUT_KEYUP, static_cast<int>(wparam), HIWORD(lparam) & 0xFF, 0, -1, -1);
+				return FALSE;
+			}
+			case WM_KEYUP:
+			{
+				//Log("按键[UP]:%d - %d", wparam, HIWORD(lparam));
+				uge::pUgei->_KeyboardEvents(INPUT_KEYUP, static_cast<int>(wparam), HIWORD(lparam) & 0xFF, 0, -1, -1);
+				break;
+			}
+			case WM_LBUTTONDOWN:
+			{
+				//Log("左键[DOWN]:%d - %d", LOWORDINT(lparam), HIWORDINT(lparam));
+				uge::pUgei->_KeyboardEvents(INPUT_MBUTTONDOWN, UGEK_LBUTTON, 0,0,LOWORDINT(lparam),HIWORDINT(lparam));
+				break;
+			}
+			case WM_MBUTTONDOWN:
+			{
+				//Log("中键[DOWN]:%d - %d", LOWORDINT(lparam), HIWORDINT(lparam));
+				uge::pUgei->_KeyboardEvents(INPUT_MBUTTONDOWN, UGEK_MBUTTON, 0, 0, LOWORDINT(lparam), HIWORDINT(lparam));
+				break;
+			}
+			case WM_RBUTTONDOWN:
+			{
+				//Log("右键[DOWN]:%d - %d", LOWORDINT(lparam), HIWORDINT(lparam));
+				uge::pUgei->_KeyboardEvents(INPUT_MBUTTONDOWN, UGEK_RBUTTON, 0, 0, LOWORDINT(lparam), HIWORDINT(lparam));
+				break;
+			}
+			case WM_LBUTTONDBLCLK:
+			{
+				//Log("左键[CLICK]:%d - %d", LOWORDINT(lparam), HIWORDINT(lparam));
+				uge::pUgei->_KeyboardEvents(INPUT_MBUTTONDOWN, UGEK_LBUTTON, 0, UGEINP_REPEAT, LOWORDINT(lparam), HIWORDINT(lparam));
+				return FALSE;
+			}
+			case WM_MBUTTONDBLCLK:
+			{
+				//Log("中键[CLICK]:%d - %d", LOWORDINT(lparam), HIWORDINT(lparam));
+				uge::pUgei->_KeyboardEvents(INPUT_MBUTTONDOWN, UGEK_MBUTTON, 0, UGEINP_REPEAT, LOWORDINT(lparam), HIWORDINT(lparam));
+				return FALSE;
+			}
+			case WM_RBUTTONDBLCLK:
+			{
+				//Log("右键[CLICK]:%d - %d", LOWORDINT(lparam), HIWORDINT(lparam));
+				uge::pUgei->_KeyboardEvents(INPUT_MBUTTONDOWN, UGEK_RBUTTON, 0, UGEINP_REPEAT, LOWORDINT(lparam), HIWORDINT(lparam));
+				return FALSE;
+			}
+			case WM_LBUTTONUP:
+			{
+				//Log("左键[UP]:%d - %d", LOWORDINT(lparam), HIWORDINT(lparam));
+				uge::pUgei->_KeyboardEvents(INPUT_MBUTTONUP, UGEK_LBUTTON, 0, 0, LOWORDINT(lparam), HIWORDINT(lparam));
+				return FALSE;
+			}
+			case WM_MBUTTONUP:
+			{
+				//Log("中键[UP]:%d - %d", LOWORDINT(lparam), HIWORDINT(lparam));
+				uge::pUgei->_KeyboardEvents(INPUT_MBUTTONUP, UGEK_MBUTTON, 0, 0, LOWORDINT(lparam), HIWORDINT(lparam));
+				return FALSE;
+			}
+			case WM_RBUTTONUP:
+			{
+				//Log("右键[UP]:%d - %d", LOWORDINT(lparam), HIWORDINT(lparam));
+				uge::pUgei->_KeyboardEvents(INPUT_MBUTTONUP, UGEK_RBUTTON, 0, 0, LOWORDINT(lparam), HIWORDINT(lparam));
+				return FALSE;
+			}
+			case WM_MOUSEMOVE:
+			{
+				//Log("鼠标[MOVE]:%d - %d", LOWORDINT(lparam), HIWORDINT(lparam));
+				uge::pUgei->_KeyboardEvents(INPUT_MOUSEMOVE, 0, 0, 0, LOWORDINT(lparam), HIWORDINT(lparam));
+				return FALSE;
+			}
+			case 0x020A: 
+			{
+				// WM_MOUSEWHEEL, GET_WHEEL_DELTA_WPARAM(wparam);
+				uge::pUgei->_KeyboardEvents(INPUT_MOUSEWHEEL, short(HIWORD(wparam)) / 120, 0, 0, LOWORDINT(lparam), HIWORDINT(lparam));
+				return FALSE;
+			}
+			case WM_SIZE:
+			{
+				Log("窗口[SIZE]:%d - %d", LOWORD(lparam), HIWORD(lparam));
+				return FALSE;
+			}
 			default:
 				break;
         }
@@ -397,12 +517,6 @@ namespace uge {
 
 		if (_index_buffer)
 			_index_buffer->Release();
-
-		if (_wzl_cache)
-		{
-			delete _wzl_cache;
-			_wzl_cache = nullptr;
-		}
 
 		Log("UGEI析构");
 	}

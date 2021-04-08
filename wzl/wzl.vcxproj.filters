@@ -15,34 +15,34 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="wzl.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="zlib\zconf.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="zlib\zlibwapi.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="wzlcache.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="help.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="defs.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
+    <ClCompile Include="help.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
     <ClCompile Include="wzl.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="wzlcache.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="help.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\defs.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\help.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\wzl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\wzlcache.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\zconf.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\zlibwapi.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -15,58 +15,52 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ugeapi.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ugedefs.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ugei.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\uge.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ugehelp.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ugecolor.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ugex.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="helper\image.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="zlib\zconf.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="zlib\zlibwapi.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ugegame.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="ugei.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="ugei_extend.cpp">
+    <ClCompile Include="ugegame.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ugehelp.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="helper\image.cpp">
+    <ClCompile Include="ugei.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ugei_dx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ugegame.cpp">
+    <ClCompile Include="ugei_extend.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="ugei_input.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\uge.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ugeapi.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ugecolor.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ugedefs.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ugegame.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ugehelp.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ugei.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ugekeys.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ugex.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

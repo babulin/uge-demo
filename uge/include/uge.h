@@ -8,6 +8,7 @@
 #include "ugedefs.h"
 #include "ugehelp.h"
 #include "ugecolor.h"
+#include "ugekeys.h"
 #include "ugegame.h"
 
 namespace uge {
@@ -28,8 +29,8 @@ namespace uge {
 	struct ugeImage{
 		float x;		//×ø±êx
 		float y;		//×ø±êy
-		float px;		//Æ«ÒÆx
-		float py;		//Æ«ÒÆy
+		int px;		//Æ«ÒÆx
+		int py;		//Æ«ÒÆy
 		int width;		//Í¼Æ¬¿í
 		int height;		//Í¼Æ¬¸ß
 		UTEXTURE tex;	//ÎÆÀíµØÖ·
@@ -59,21 +60,29 @@ namespace uge {
 		virtual void UGE_CALL SetUpdateCallback(const ugeCallback value) = 0;
 		virtual void UGE_CALL SetGame(ugeGame* game) = 0;
 		virtual void UGE_CALL SetScreen(int width,int height) = 0;
+		virtual void UGE_CALL GetScreen(int* width,int* height) = 0;
 		virtual void UGE_CALL SetTitle(const char* title) = 0;
 		virtual void UGE_CALL SetWindowed(bool value) = 0;
 		virtual bool UGE_CALL Initiate() = 0;
 		virtual bool UGE_CALL Start() = 0;
 		virtual void UGE_CALL Release() = 0;
 		virtual std::string GetErrMsg() = 0;
+		
+		//Ìá¹©¸øwzl.dll
+		virtual UTEXTURE UGE_CALL CreateWzlTexture(int width,int height,int pixelFormat,const RGBQUAD palette[256], byte* dstBuffer) = 0;
+		virtual void UGE_CALL ReleaseWzlTexture(UTEXTURE tex) = 0;
 
+		//äÖÈ¾
 		virtual bool LoadTexture(const char* filename, bool bMipmap = false) = 0;
-		virtual bool LoadWzl(const char* path, int sort, ugeImage* image) = 0;
-		virtual bool LoadWzl(const char* path, int sort,int total, ugeAnimation* animation) = 0;
-		virtual bool ReleaseWzl(ugeImage* image) = 0;
-		virtual bool ReleaseWzl(ugeAnimation* animation) = 0;
 		virtual void DxRenderQuad(ugeImage* image, bool fillMode = false) = 0;
 		virtual void DxRenderQuad(ugeAnimation* animation, bool fillMode = false) = 0;
 		virtual void DxRenderQuad(ugeLine* line) = 0;
+
+		//°´¼ü
+		virtual void GetMousePos(float *x,float *y) = 0;
+		virtual bool KeyDown(const int key) = 0;
+		virtual bool KeyUp(const int key) = 0;
+		virtual bool KeyState(const int key) = 0;
 	};
 
 	ugeGame* gameCreate(UGE* _uge);
