@@ -1,10 +1,10 @@
-#include "map.h"
+#include "mapx.h"
 
 namespace game {
 
-	ugeLine map1, map2;
+	ugeLine map3, map4;
 
-	Map::Map(UGE* pUge)
+	MapX::MapX(UGE* pUge)
 	{
 		this->pUge = pUge;
 		pWzlCache = new WzlCache(pUge);
@@ -21,33 +21,33 @@ namespace game {
 		int maph = ((mapSizeH - 1) / 2) * 32 + 32;
 		offsetY += screen_height/2 - maph;
 
-		_Load("map\\0.map");
+		_Load("map\\nga0.map");
 
-		centerX = 310;
-		centerY = 271;
+		centerX = 0;
+		centerY = 15;
 		_LoadMap(centerX, centerY);
 	}
 
-	void Map::_Load(const char* path)
+	void MapX::_Load(const char* path)
 	{
 		int size = 0;
 		void* data = open_file(path, &size);
 
 		//头部
 		byte* btData = reinterpret_cast<byte*>(data);
-		memcpy_s(&mapHead, size, btData, sizeof(MapHeader));
+		memcpy_s(&mapHead, size, btData, sizeof(MapHeaderX));
 
 		//读取到信息中[地图从左往右，从上往下]
 		btData = btData + sizeof(mapHead);//偏移头部
 		const int infoSize = mapHead.width * mapHead.height;//结构体大小
-		mapInfo = new MapInfo[infoSize];
-		memcpy_s(mapInfo, size, btData, infoSize * sizeof(MapInfo));
+		mapInfo = new MapInfo36[infoSize];
+		memcpy_s(mapInfo, size, btData, infoSize * sizeof(MapInfo36));
 
 		//释放源数据
 		free(data);
 	}
 
-	void Map::_LoadMap(int x, int y)
+	void MapX::_LoadMap(int x, int y)
 	{
 		//每次初始化
 		vBtLight.clear();
@@ -81,8 +81,13 @@ namespace game {
 				{
 					break;
 				}
-				
+
 				int sort = tx * mapHead.height + ty;
+
+				if (sort == 44)
+				{
+					int i = 0;
+				}
 
 				if (ty < y+ mapSizeH)
 				{
@@ -94,15 +99,15 @@ namespace game {
 		}
 	}
 
-	float Map::_GetWidthOffset(int val,int val2) {
+	float MapX::_GetWidthOffset(int val,int val2) {
 		return static_cast<float>(val * bWidth + offsetX + val2);
 	}
 
-	float Map::_GetHeightOffset(int val, int val2) {
+	float MapX::_GetHeightOffset(int val, int val2) {
 		return static_cast<float>(val * bHeight + offsetY + val2);
 	}
 
-	void Map::_Tiles(int sx, int sy,int tx,int ty,int sort)
+	void MapX::_Tiles(int sx, int sy,int tx,int ty,int sort)
 	{
 
 		if (sort < 0){
@@ -114,14 +119,11 @@ namespace game {
 		if (tiles >= 0 && (tx % 2 == 0 && ty % 2 == 0))
 		{
 			char szTilesFile[_MAX_DIR] = "data\\Tiles";
-			int area = mapInfo[sort].btArea + 1;//1-Tiles 2-Tiles2
+			//int area = mapInfo[sort].btArea + 1;//1-Tiles 2-Tiles2
+			int area = mapInfo[sort].btBackIndex + 1;//1-Tiles 2-Tiles2
 			if (area > 1)
 			{
-				//sprintf_s(szTilesFile, "data\\Tiles%d", area);
-			}
-			if (tx == 336 && ty == 358)
-			{
-				int i = 0;
+				sprintf_s(szTilesFile, "data\\Tiles%d", area);
 			}
 
 			wzl::ugeImage image;
@@ -133,7 +135,7 @@ namespace game {
 		}
 	}
 
-	void Map::_SmTiles(int sx, int sy, int sort)
+	void MapX::_SmTiles(int sx, int sy, int sort)
 	{
 		if (sort < 0){
 			return;
@@ -141,15 +143,15 @@ namespace game {
 
 		//SmTiles
 		int smTiles = (mapInfo[sort].wMidImg & 32767) - 1;
-		if (smTiles >= 0)
+		if (smTiles >= 0 && mapInfo[sort].wMidImg != 0XFFFF)
 		{
 			char szSmTilesFile[_MAX_DIR] = "data\\SmTiles";
-			int area = mapInfo[sort].btArea + 1;//1-SmTiles 2-SmTiles2
+			//int area = mapInfo[sort].btArea + 1;//1-SmTiles 2-SmTiles2
+			int area = mapInfo[sort].btMidIndex + 1;//1-SmTiles 2-SmTiles2
 			if (area > 1)
 			{
-				//sprintf_s(szSmTilesFile, "data\\SmTiles%d", area);
+				sprintf_s(szSmTilesFile, "data\\SmTiles%d", area);
 			}
-
 			wzl::ugeImage image;
 			if (pWzlCache->LoadWzl(szSmTilesFile, smTiles, &image)) {
 				image.x = _GetWidthOffset(sx, -1 * image.px);
@@ -159,7 +161,7 @@ namespace game {
 		}
 	}
 
-	void Map::_Objects(int sx, int sy, int sort)
+	void MapX::_Objects(int sx, int sy, int sort)
 	{
 		if (sort < 0){
 			return;
@@ -173,6 +175,7 @@ namespace game {
 		if (object > 0)
 		{
 			char szObjectFile[_MAX_DIR] = "data\\Objects";
+			//int area = mapInfo[sort].btArea + 1;//1-Objects 2-Objects2
 			int area = mapInfo[sort].btArea + 1;//1-Objects 2-Objects2
 			if (area > 1)
 			{
@@ -199,7 +202,7 @@ namespace game {
 	}
 
 
-	void Map::Update()
+	void MapX::Update()
 	{
 		if (pUge->KeyState(UGEK_UP))
 		{
@@ -219,7 +222,7 @@ namespace game {
 		}
 	}
 
-	void Map::Show(bool fillmode)
+	void MapX::Show(bool fillmode)
 	{
 
 		//Tiles
@@ -240,13 +243,13 @@ namespace game {
 			pUge->DxRenderQuad(reinterpret_cast<uge::ugeImage*>(itImage._Ptr));
 		}
 
-		//Light
-		pUge->SetDrawMode(UGE_DW_LIGHT);
-		for (std::vector<wzl::ugeAnimation>::iterator it = vBtLight.begin(); it != vBtLight.end(); it++)
-		{
-			pUge->DxRenderQuad(reinterpret_cast<uge::ugeAnimation*>(it._Ptr));
-		}
-		pUge->SetDrawMode(UGE_DW_NORMAL);
+		//Light 动画水有点小问题
+		//pUge->SetDrawMode(UGE_DW_LIGHT);
+		//for (std::vector<wzl::ugeAnimation>::iterator it = vBtLight.begin(); it != vBtLight.end(); it++)
+		//{
+		//	pUge->DxRenderQuad(reinterpret_cast<uge::ugeAnimation*>(it._Ptr));
+		//}
+		//pUge->SetDrawMode(UGE_DW_NORMAL);
 	}
 
 }

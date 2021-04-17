@@ -34,8 +34,8 @@ namespace uge {
 		int width;		//图片宽
 		int height;		//图片高
 		UTEXTURE tex;	//纹理地址
-		char path[_MAX_DIR];
 		int sort;
+		char path[_MAX_DIR];
 	};
 
 	// 动画资源
@@ -46,11 +46,18 @@ namespace uge {
 		int curFrame;		//当前帧
 		float rate;			//播放帧率
 		float time;			//前帧时间
-		ugeImage image[8];	//图片集合
+		ugeImage image[10];	//图片集合
 	};
 
 	// 回调函数类型
 	typedef bool (*ugeCallback)();
+
+	// 枚举
+	enum DrawMode
+	{
+		UGE_DW_NORMAL,
+		UGE_DW_LIGHT,
+	};
 
 	// 引擎接口
 	class UGE {
@@ -73,6 +80,7 @@ namespace uge {
 		virtual void UGE_CALL ReleaseWzlTexture(UTEXTURE tex) = 0;
 
 		//渲染
+		virtual void SetDrawMode(DrawMode dw) = 0;
 		virtual bool LoadTexture(const char* filename, bool bMipmap = false) = 0;
 		virtual void DxRenderQuad(ugeImage* image, bool fillMode = false) = 0;
 		virtual void DxRenderQuad(ugeAnimation* animation, bool fillMode = false) = 0;

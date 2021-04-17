@@ -64,6 +64,8 @@ namespace wzl {
 		// 传出参数
 		strcpy_s(image->path, path);
 		image->sort = sort;
+		image->x = 0;
+		image->y = 0;
 		image->px = wzlTex->wzlBmpInfo.x;
 		image->py = wzlTex->wzlBmpInfo.y;
 		image->width = wzlTex->wzlBmpInfo.width;
@@ -79,13 +81,15 @@ namespace wzl {
         for (int i = 0; i < total; i++)
         {
             int t_sort = sort + i;
-            LoadWzl(path, t_sort, &animation->image[i]);
+			if (LoadWzl(path, t_sort, &animation->image[i])) {
+
+			}
         }
 
         animation->total = total;
         animation->curFrame = 0;
         animation->time = 0;
-        animation->rate = 8.0f / 60.0f;
+        animation->rate = 7.0f / 60.0f;
 
         return true;
     }

@@ -171,6 +171,7 @@
     <ClCompile Include="hum.cpp" />
     <ClCompile Include="login.cpp" />
     <ClCompile Include="map.cpp" />
+    <ClCompile Include="mapx.cpp" />
     <ClCompile Include="tut01.cpp" />
     <ClCompile Include="world.cpp" />
   </ItemGroup>
@@ -179,6 +180,7 @@
     <ClInclude Include="include\hum.h" />
     <ClInclude Include="include\login.h" />
     <ClInclude Include="include\map.h" />
+    <ClInclude Include="include\mapx.h" />
     <ClInclude Include="include\world.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

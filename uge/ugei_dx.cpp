@@ -201,17 +201,32 @@ namespace uge {
         _d3d_device->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);          //打开Alpha渲染
         _d3d_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);     //源混合要素
         _d3d_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA); //目标混合要素
-
+                
         _d3d_device->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);           //开启Alpha测试
         _d3d_device->SetRenderState(D3DRS_ALPHAREF, 0x01);                  //Alpha测试值
         _d3d_device->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);  //大于等于成功
-
 
         _d3d_device->SetTransform(D3DTS_VIEW, &_view_matrix);
         _d3d_device->SetTransform(D3DTS_PROJECTION, &_proj_matrix);
 
         return true;
     }
+
+
+    void UGEI::SetDrawMode(DrawMode dw) {
+
+        if (dw == UGE_DW_NORMAL)
+        {
+            _d3d_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);     //源混合要素
+            _d3d_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA); //目标混合要素
+        }
+        else if (dw == UGE_DW_LIGHT) {
+            //高光效果
+            _d3d_device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
+            _d3d_device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+        }
+    }
+
 
     void UGEI::_BeginScene()
     {
@@ -270,6 +285,7 @@ namespace uge {
             _d3d_device->SetTexture(0, reinterpret_cast<UgeTexture*>(quad.tex));
             _d3d_device->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
         }
+
         memcpy(&_vert_array[_n_prim * UGEPRIM_QUADS], quad.v,sizeof(ugeVertex) * UGEPRIM_QUADS);
         _d3d_device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, 4, _n_prim * 6, 2);
         _n_prim++;
@@ -293,7 +309,7 @@ namespace uge {
         animation->image[animation->curFrame].x = animation->x;
         animation->image[animation->curFrame].y = animation->y;
 
-        DxRenderQuad(&animation->image[animation->curFrame]);
+        DxRenderQuad(&animation->image[animation->curFrame], fillMode);
     }
 
     void UGEI::DxRenderQuad(ugeLine* line)
@@ -396,7 +412,7 @@ namespace uge {
                         imageData3[index] = D3DCOLOR_ARGB(0xff, r, g, b);
                     }
                     else {
-                        imageData3[index] = D3DCOLOR_ARGB(0x88, 0, 0, 0);
+                        imageData3[index] = D3DCOLOR_ARGB(0, 0, 0, 0);
                     }
                 }
                 else if (pixelFormat == 5)
@@ -443,15 +459,15 @@ namespace uge {
         //解锁
         p_tex->UnlockRect(0);
 
-        if (pixelFormat == 15) {
+        if (pixelFormat == 5) {
 
             //新建一个D3DFMT_A8R8G8B8
             IDirect3DSurface9* srcSurface;
             p_tex->GetSurfaceLevel(0, &srcSurface);
 
-            IDirect3DTexture9* dstTexture = nullptr;
+            UgeTexture* dstTexture;
             IDirect3DSurface9* dstSurface;
-            _d3d_device->CreateTexture(tWidth, tHeight, 0, D3DUSAGE_DYNAMIC, D3DFMT_A8B8G8R8, D3DPOOL_DEFAULT, &dstTexture, NULL);
+            _d3d_device->CreateTexture(tWidth, tHeight, 0, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &dstTexture, NULL);
             dstTexture->GetSurfaceLevel(0, &dstSurface);
 
             D3DXLoadSurfaceFromSurface(

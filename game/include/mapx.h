@@ -8,7 +8,7 @@ using namespace uge;
 using namespace wzl;
 namespace game {
 
-	struct MapHeader {
+	struct MapHeaderX {
 		short width;	//地图宽
 		short height;	//地图高
 		char title[16];
@@ -16,7 +16,7 @@ namespace game {
 		char Reserved[24];
 	};
 
-	struct MapInfo {
+	struct MapInfo36 {
 		unsigned short wBkImg;	//第一层
 		unsigned short wMidImg; //第二层
 		unsigned short wFrImg;	//第三层
@@ -25,29 +25,29 @@ namespace game {
 		byte btAniFrame;
 		byte btAniTick;
 		byte btArea;
-		//byte btLight;			//12字节
-		//byte btBackIndex;
-		//byte btMidIndex;		//14字节
-		//unsigned short TileAnimationImage;//15-16字节
-		//byte reserved1[5];//保留17-21字节
-		//byte TileAnimationOffset;	//22字节
-		//unsigned short TileAnimationFrame;//23-24字节
-		//byte reserved2[12];//保留25-36字节
+		byte btLight;			//12字节
+		byte btBackIndex;
+		byte btMidIndex;		//14字节
+		unsigned short TileAnimationImage;//15-16字节
+		byte reserved1[5];//保留17-21字节
+		byte TileAnimationOffset;	//22字节
+		unsigned short TileAnimationFrame;//23-24字节
+		byte reserved2[12];//保留25-36字节
 	};
 
-	class Map {
+	class MapX {
 
 		WzlCache* pWzlCache;					//wzl缓存对象
 		UGE* pUge;								//引擎对象
-		MapHeader mapHead;						//map头部结构体
-		MapInfo* mapInfo;						//map数据结构体
+		MapHeaderX mapHead;						//map头部结构体
+		MapInfo36* mapInfo;						//map数据结构体
 
 		int bWidth = 48;						//坐标像素宽度
 		int bHeight = 32;						//坐标像素高度
 		int offsetX = -7;						//地图绘制中心点X偏移
 		int offsetY = 44;						//地图绘制中心点Y偏移
-		static const int mapSizeW = 25;			//地图绘制尺寸21x21
-		static const int mapSizeH = 25;			//地图绘制尺寸21x21
+		static const int mapSizeW = 41;			//地图绘制尺寸21x21
+		static const int mapSizeH = 41;			//地图绘制尺寸21x21
 
 		std::vector<wzl::ugeImage> vUiTiles;		//大瓷砖
 		std::vector<wzl::ugeImage> vUiSmTiles;		//小瓷砖
@@ -59,7 +59,7 @@ namespace game {
 		int centerX;
 		int centerY;
 	public:
-		Map(UGE* pUge);
+		MapX(UGE* pUge);
 		void Update();
 		void Show(bool fillmode);
 	private:

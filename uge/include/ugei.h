@@ -53,6 +53,7 @@ namespace uge {
 		virtual void UGE_CALL ReleaseWzlTexture(UTEXTURE tex) override;
 
 		//‰÷»æ
+		virtual void SetDrawMode(DrawMode dw) override;
 		virtual bool LoadTexture(const char* filename, bool bMipmap = false) override;
 		virtual void DxRenderQuad(ugeImage* image, bool fillMode = false) override;
 		virtual void DxRenderQuad(ugeAnimation* animation, bool fillMode = false) override;

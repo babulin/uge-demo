@@ -2,6 +2,7 @@
 #include "login.h"
 #include "map.h"
 #include "hum.h"
+#include "mapx.h"
 
 namespace game {
 

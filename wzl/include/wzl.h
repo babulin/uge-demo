@@ -28,7 +28,7 @@ namespace wzl {
 		int curFrame;		//当前帧
 		float rate;			//播放帧率
 		float time;			//前帧时间
-		ugeImage image[8];	//图片集合
+		ugeImage image[10];	//图片集合
 	};
 
 	//wzx头部结构
