@@ -23,8 +23,8 @@ namespace game {
 
 		_Load("map\\nga0.map");
 
-		centerX = 0;
-		centerY = 15;
+		centerX = 150;
+		centerY = 40;
 		_LoadMap(centerX, centerY);
 	}
 
@@ -51,9 +51,12 @@ namespace game {
 	{
 		//每次初始化
 		vBtLight.clear();
+		vBtTileAni.clear();
 		vUiTiles.clear();
 		vUiSmTiles.clear();
 		vUiObjects.clear();
+
+		std::cout <<"地图坐标："<< x << ":" << y << std::endl;
 
 		x = x - 12;
 		y = y - 12;
@@ -93,6 +96,7 @@ namespace game {
 				{
 					_Tiles(sx, sy, tx, ty, sort);
 					_SmTiles(sx, sy, sort);
+					_Animation(sx, sy, sort);
 				}
 				_Objects(sx, sy, sort);
 			}
@@ -161,6 +165,28 @@ namespace game {
 		}
 	}
 
+	void MapX::_Animation(int sx, int sy, int sort)
+	{
+		if (sort < 0) {
+			return;
+		}
+
+		//地图上等的标识
+		int tileAni = (mapInfo[sort].TileAnimationImage);
+		int tileTotal = (mapInfo[sort].TileAnimationOffset);
+		int tileFrame = (mapInfo[sort].TileAnimationFrame);
+		if (tileAni > 0 && tileFrame > 0)
+		{
+			int offset = tileFrame ^ 0x2000;
+			char szObjectFile[_MAX_DIR] = "data\\AniTiles1";
+			wzl::ugeAnimation animation;
+			pWzlCache->LoadWzl(szObjectFile, tileAni - 1, tileTotal, &animation, offset);
+			animation.x = _GetWidthOffset(sx);
+			animation.y = _GetHeightOffset(sy);
+			vBtTileAni.push_back(animation);
+		}
+	}
+
 	void MapX::_Objects(int sx, int sy, int sort)
 	{
 		if (sort < 0){
@@ -177,6 +203,7 @@ namespace game {
 			char szObjectFile[_MAX_DIR] = "data\\Objects";
 			//int area = mapInfo[sort].btArea + 1;//1-Objects 2-Objects2
 			int area = mapInfo[sort].btArea + 1;//1-Objects 2-Objects2
+
 			if (area > 1)
 			{
 				sprintf_s(szObjectFile, "data\\Objects%d", area);
@@ -184,8 +211,13 @@ namespace game {
 
 			if (light > 0)
 			{
+				if (light > 0x7F)
+				{
+					light = light - 128;
+				}
+
 				wzl::ugeAnimation animation;
-				pWzlCache->LoadWzl(szObjectFile, object + 1, 9, &animation);
+				pWzlCache->LoadWzl(szObjectFile, object, light, &animation);
 				animation.x = _GetWidthOffset(sx);
 				animation.y = _GetHeightOffset(sy, bHeight - animation.image[0].height);
 				vBtLight.push_back(animation);
@@ -237,6 +269,12 @@ namespace game {
 			pUge->DxRenderQuad(reinterpret_cast<uge::ugeImage*>(itSmTiles._Ptr));
 		}
 
+		//Light 动画水有点小问题
+		for (std::vector<wzl::ugeAnimation>::iterator it = vBtTileAni.begin(); it != vBtTileAni.end(); it++)
+		{
+			pUge->DxRenderQuad(reinterpret_cast<uge::ugeAnimation*>(it._Ptr));
+		}
+
 		//Object
 		for (std::vector<wzl::ugeImage>::iterator itImage = vUiObjects.begin(); itImage != vUiObjects.end(); itImage++)
 		{
@@ -244,12 +282,12 @@ namespace game {
 		}
 
 		//Light 动画水有点小问题
-		//pUge->SetDrawMode(UGE_DW_LIGHT);
-		//for (std::vector<wzl::ugeAnimation>::iterator it = vBtLight.begin(); it != vBtLight.end(); it++)
-		//{
-		//	pUge->DxRenderQuad(reinterpret_cast<uge::ugeAnimation*>(it._Ptr));
-		//}
-		//pUge->SetDrawMode(UGE_DW_NORMAL);
+		pUge->SetDrawMode(UGE_DW_LIGHT);
+		for (std::vector<wzl::ugeAnimation>::iterator it = vBtLight.begin(); it != vBtLight.end(); it++)
+		{
+			pUge->DxRenderQuad(reinterpret_cast<uge::ugeAnimation*>(it._Ptr));
+		}
+		pUge->SetDrawMode(UGE_DW_NORMAL);
 	}
 
 }

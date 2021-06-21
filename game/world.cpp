@@ -7,6 +7,7 @@
 namespace game {
 
 	Map* map;
+	//MapX* map;
 	Hum* hum;
 
 	bool fillmode = false;
@@ -15,8 +16,9 @@ namespace game {
 	{
 		std::cout << "World::Initiate()" << std::endl;
 
-		map = new Map(pUge);
 		hum = new Hum(pUge);
+		map = new Map(pUge, &hum);
+		//map = new MapX(pUge);
 
 		return true;
 	}

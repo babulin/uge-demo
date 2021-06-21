@@ -83,12 +83,15 @@ namespace wzl {
 		return true;
 	}
 
-    bool WzlCache::LoadWzl(const char* path, int sort, int total, ugeAnimation* animation)
+    bool WzlCache::LoadWzl(const char* path, int sort, int total, ugeAnimation* animation ,int offset)
     {
         // 从缓存获取纹理
+		int t_sort = 0;
         for (int i = 0; i < total; i++)
         {
-            int t_sort = sort + i;
+			//序号
+			t_sort = sort + (i * offset);
+
 			if (LoadWzl(path, t_sort, &animation->image[i])) {
 
 			}

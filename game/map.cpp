@@ -1,10 +1,11 @@
 #include "map.h"
 
+
 namespace game {
 
 	ugeLine map1, map2;
 
-	Map::Map(UGE* pUge)
+	Map::Map(UGE* pUge,Hum** hum)
 	{
 		this->pUge = pUge;
 		pWzlCache = new WzlCache(pUge);
@@ -23,9 +24,11 @@ namespace game {
 
 		_Load("map\\0.map");
 
-		centerX = 310;
-		centerY = 271;
-		_LoadMap(centerX, centerY);
+		//±£´æ½ÇÉ«
+		this->_hum = hum;
+		x = (*hum)->x;
+		y = (*hum)->y;
+		_LoadMap(x, y);
 	}
 
 	void Map::_Load(const char* path)
@@ -201,21 +204,13 @@ namespace game {
 
 	void Map::Update()
 	{
-		if (pUge->KeyState(UGEK_UP))
+		//Log("x:%.2f", (*_hum)->x);
+
+		if (x != (*_hum)->x || y != (*_hum)->y)
 		{
-			_LoadMap(centerX, --centerY);
-		}
-		if (pUge->KeyState(UGEK_DOWN))
-		{
-			_LoadMap(centerX, ++centerY);
-		}
-		if (pUge->KeyState(UGEK_LEFT))
-		{
-			_LoadMap(--centerX, centerY);
-		}
-		if (pUge->KeyState(UGEK_RIGHT))
-		{
-			_LoadMap(++centerX, centerY);
+			x = (*_hum)->x;
+			y = (*_hum)->y;
+			_LoadMap(x, y);
 		}
 	}
 

@@ -46,7 +46,7 @@ namespace uge {
 		int curFrame;		//当前帧
 		float rate;			//播放帧率
 		float time;			//前帧时间
-		ugeImage image[10];	//图片集合
+		ugeImage image[20];	//图片集合
 	};
 
 	// 回调函数类型

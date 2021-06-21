@@ -53,6 +53,7 @@ namespace game {
 		std::vector<wzl::ugeImage> vUiSmTiles;		//小瓷砖
 		std::vector<wzl::ugeImage> vUiObjects;		//物体对象
 		std::vector<wzl::ugeAnimation> vBtLight;//地图灯动画
+		std::vector<wzl::ugeAnimation> vBtTileAni;//荷花水波
 
 		int screen_width;
 		int screen_height;
@@ -69,6 +70,7 @@ namespace game {
 		void _LoadMap(int x, int y);
 		void _Tiles(int sx, int sy, int tx, int ty, int sort);
 		void _SmTiles(int sx, int sy,int sort);
+		void _Animation(int sx, int sy, int sort);
 		void _Objects(int sx, int sy, int sort);
 	};
 }

@@ -29,6 +29,9 @@ namespace game {
 		int screen_height;
 		DIRECTION current_dir;
 	public:
+		float x = 310.0f;
+		float y = 271.0f;
+	public:
 		Hum(UGE* pUge);
 		void Update();
 		void Show();

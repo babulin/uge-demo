@@ -11,7 +11,7 @@ namespace wzl {
 		WzlCache(uge::UGE* pUge);
 		~WzlCache();
 		bool LoadWzl(const char* path, int sort, ugeImage* image);
-		bool LoadWzl(const char* path, int sort, int total, ugeAnimation* animation);
+		bool LoadWzl(const char* path, int sort, int total, ugeAnimation* animation,int offset = 1);
 		//UTEXTURE CreateWzlTexture(wzl::WzlBmpInfo wzlBmp, byte* dstBuffer, bool has16To32 = false);
 		bool ReleaseWzl(ugeImage* image);
 		bool ReleaseWzl(ugeAnimation* animation);

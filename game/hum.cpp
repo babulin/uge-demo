@@ -26,12 +26,29 @@ namespace game {
 
 	void Hum::Update()
 	{
-		float x{ 0 }, y{ 0 };
-		pUge->GetMousePos(&x,&y);
+		float _x{ 0 }, _y{ 0 };
+		pUge->GetMousePos(&_x,&_y);
 		if (pUge->KeyDown(UGEK_LBUTTON))
 		{
-			_GetDir(x, y);
+			_GetDir(_x, _y);
 			_Load(current_dir * 8, 4);
+		}
+
+		if (pUge->KeyDown(UGEK_UP))
+		{
+			y = --y;
+		}
+		if (pUge->KeyDown(UGEK_RIGHT))
+		{
+			y = ++y;
+		}
+		if (pUge->KeyDown(UGEK_DOWN))
+		{
+			x = --x;
+		}
+		if (pUge->KeyDown(UGEK_LEFT))
+		{
+			x = ++x;
 		}
 	}
 

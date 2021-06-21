@@ -3,6 +3,7 @@
 #include <wzlcache.h>
 #include <vector>
 #include <algorithm>
+#include "hum.h"
 
 using namespace uge;
 using namespace wzl;
@@ -56,10 +57,12 @@ namespace game {
 
 		int screen_width;
 		int screen_height;
-		int centerX;
-		int centerY;
+
+		Hum** _hum;
+		float x = 0;
+		float y = 0;
 	public:
-		Map(UGE* pUge);
+		Map(UGE* pUge,Hum** hum);
 		void Update();
 		void Show(bool fillmode);
 	private:
