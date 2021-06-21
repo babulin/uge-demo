@@ -18,8 +18,17 @@ namespace wzl {
         _wzlTexMap = new UWzlTexMap();
         this->pUge = pUge;
 
-        _LoadWzx();
-        _LoadWzl();
+
+    }
+
+    bool Wzl::Init() {
+        if (!_LoadWzx()) {
+            return false;
+        }
+        if (!_LoadWzl()) {
+            return false;
+        }
+        return true;
     }
 
     //+-----------------------------------
@@ -41,7 +50,7 @@ namespace wzl {
         //∂¡»°Õ∑≤ø
         memcpy_s(&wzxHead, wzxSize, wzxData, sizeof(wzxHead));
 
-        return false;
+        return true;
     }
 
     //+-----------------------------------

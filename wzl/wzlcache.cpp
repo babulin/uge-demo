@@ -40,6 +40,10 @@ namespace wzl {
 		{
 			//加载文件
 			Wzl* t_wzl = new Wzl(path,pUge);
+			
+			if ( ! t_wzl->Init()) {
+				return nullptr;
+			}
 
             //缓存
 			_wzlMap->insert(std::pair<std::string, Wzl*>(name, t_wzl));
@@ -53,6 +57,10 @@ namespace wzl {
 	{
 		// 从资源获取缓存
 		Wzl* t_wzl = _GetWzlCache(path);
+		if (t_wzl == nullptr)
+		{
+			return false;
+		}
 
 		// 从缓存获取纹理
 		WzlBmpTex* wzlTex = t_wzl->GetTextureCache(sort);

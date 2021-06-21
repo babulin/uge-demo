@@ -34,7 +34,7 @@ namespace wzl {
             char buff[255] = {}, path[255] = {};
             GetCurrentDirectory(255, path);
             DWORD dw = GetLastError();
-            sprintf_s(buff, "文件打开失败,代码:%d,路径:%s下未找到", dw, path);
+            sprintf_s(buff, "文件打开失败,代码:%d,路径:%s\\%s", dw, path, filename);
             Log(buff);
             return nullptr;
         }

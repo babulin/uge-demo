@@ -345,6 +345,7 @@ namespace wzl {
 	public:
 		Wzl(const char* path,uge::UGE* pUge);
 		~Wzl();
+		bool Init();
 		WzlBmpTex* GetTextureCache(int sort);
 		bool ReleaseTexture(int sort, bool* hasErase);
 	private:
