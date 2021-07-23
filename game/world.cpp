@@ -7,7 +7,7 @@
 namespace game {
 
 	Map* map;
-	//MapX* map;
+	MapX* mapx;
 	Hum* hum;
 
 	bool fillmode = false;
@@ -18,13 +18,14 @@ namespace game {
 
 		hum = new Hum(pUge);
 		map = new Map(pUge, &hum);
-		//map = new MapX(pUge);
+		//mapx = new MapX(pUge);
 
 		return true;
 	}
 
 	bool World::Update()
 	{
+		//mapx->Update();
 		map->Update();
 		hum->Update();
 		return true;
@@ -32,6 +33,7 @@ namespace game {
 
 	bool World::Show()
 	{
+		//mapx->Show(fillmode);
 		map->Show(fillmode);
 		hum->Show();
 		return true;

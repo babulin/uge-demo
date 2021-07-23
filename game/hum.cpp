@@ -40,15 +40,15 @@ namespace game {
 		}
 		if (pUge->KeyDown(UGEK_RIGHT))
 		{
-			y = ++y;
+			x = ++x;
 		}
 		if (pUge->KeyDown(UGEK_DOWN))
 		{
-			x = --x;
+			y = ++y;
 		}
 		if (pUge->KeyDown(UGEK_LEFT))
 		{
-			x = ++x;
+			x = --x;
 		}
 	}
 
