@@ -59,10 +59,13 @@ namespace game {
 		int screen_height;
 
 		Hum** _hum;
+		const char* mapName;
 		float x = 0;
 		float y = 0;
 	public:
 		Map(UGE* pUge,Hum** hum);
+		void SetMap(const char * mapName);
+		void Load();
 		void Update();
 		void Show(bool fillmode);
 	private:

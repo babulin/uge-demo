@@ -7,6 +7,8 @@ namespace game {
 
 	Map::Map(UGE* pUge,Hum** hum)
 	{
+		mapName = nullptr;
+
 		this->pUge = pUge;
 		pWzlCache = new WzlCache(pUge);
 
@@ -22,14 +24,31 @@ namespace game {
 		int maph = ((mapSizeH - 1) / 2) * 32 + 32;
 		offsetY += screen_height/2 - maph;
 
-		_Load("map\\0.map");
+		//_Load("map\\0.map");
 
 		//保存角色
 		this->_hum = hum;
 		x = (*hum)->x;
 		y = (*hum)->y;
+
+	}
+
+	void Map::SetMap(const char* mapName)
+	{
+		this->mapName = mapName;
+	}
+
+	void Map::Load()
+	{
+		//地图路径
+		char map[20] = "map\\";
+		strcat_s(map,sizeof(map), mapName);
+		strcat_s(map, sizeof(map), ".map");
+		_Load(map);
 		_LoadMap(x, y);
 	}
+
+
 
 	void Map::_Load(const char* path)
 	{

@@ -91,8 +91,8 @@ namespace game {
 
 	void Hum::Show()
 	{
-		pUge->DxRenderQuad(&line1);
-		pUge->DxRenderQuad(&line2);
+		//pUge->DxRenderQuad(&line1);
+		//pUge->DxRenderQuad(&line2);
 
 		anima.x = static_cast<float>(screen_width/2 - 25);
 		anima.y = static_cast<float>(screen_height/2 - 22);

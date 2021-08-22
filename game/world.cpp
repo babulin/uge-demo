@@ -18,6 +18,8 @@ namespace game {
 
 		hum = new Hum(pUge);
 		map = new Map(pUge, &hum);
+		map->SetMap("0");
+		map->Load();
 		//mapx = new MapX(pUge);
 
 		return true;
@@ -25,6 +27,30 @@ namespace game {
 
 	bool World::Update()
 	{
+		if (pUge->KeyDown(UGEK_0)) {
+			map->SetMap("0");
+			map->Load();
+			hum->x = 333;
+			hum->y = 263;
+		}
+
+		if (pUge->KeyDown(UGEK_1)) {
+			map->SetMap("1");
+			map->Load();
+			hum->x = 333;
+			hum->y = 263;
+		}
+
+		if (pUge->KeyDown(UGEK_2)) {
+			map->SetMap("2");
+			map->Load();
+		}
+
+		if (pUge->KeyDown(UGEK_3)) {
+			map->SetMap("3");
+			map->Load();
+		}
+
 		//mapx->Update();
 		map->Update();
 		hum->Update();
